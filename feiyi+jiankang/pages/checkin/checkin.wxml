@@ -1,0 +1,94 @@
+<view class="container">
+  <!-- 日历部分 -->
+  <view class="calendar-card">
+    <view class="calendar-header">
+      <view class="prev" bindtap="prevMonth">◀</view>
+      <view class="current-month">{{currentYear}}年{{currentMonth}}月</view>
+      <view class="next" bindtap="nextMonth">▶</view>
+    </view>
+    <view class="weeks">
+      <view wx:for="{{weeks}}" wx:key="*this">{{item}}</view>
+    </view>
+    <view class="days">
+      <view wx:for="{{calendarDays}}" wx:key="date" class="day-item {{item.status}} {{item.isToday ? 'today' : ''}}" bindtap="selectDate" data-date="{{item.date}}">
+        <text>{{item.day}}</text>
+        <view wx:if="{{item.hasRecord}}" class="dot"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 每日目标 -->
+  <view class="card goal-card">
+    <view class="card-title">每日目标</view>
+    <view class="goal-items">
+      <view class="goal-item">
+        <text>卡路里消耗</text>
+        <input type="number" value="{{goals.calories}}" bindinput="inputGoal" data-key="calories" placeholder="0" />
+        <text>kcal</text>
+      </view>
+      <view class="goal-item">
+        <text>健康度提升</text>
+        <input type="number" value="{{goals.health}}" bindinput="inputGoal" data-key="health" placeholder="0" />
+        <text>点</text>
+      </view>
+      <view class="goal-item">
+        <text>修养度提升</text>
+        <input type="number" value="{{goals.cultivation}}" bindinput="inputGoal" data-key="cultivation" placeholder="0" />
+        <text>点</text>
+      </view>
+    </view>
+    <button class="btn-save-goal" bindtap="saveGoals">保存目标</button>
+  </view>
+
+  <!-- 打卡记录 -->
+  <view class="card record-card">
+    <view class="card-title">日期打卡 ({{selectedDate}})</view>
+    <view class="form-item">
+      <text>当前体重 (kg)</text>
+      <input type="digit" value="{{record.weight}}" bindinput="inputWeight" placeholder="请输入体重" />
+    </view>
+    <view class="form-item">
+      <text>非遗项目 (点击选择并填写时长/重量)</text>
+      <checkbox-group bindchange="checkboxChange">
+        <view class="project-list">
+          <view class="project-item-container" wx:for="{{allProjects}}" wx:key="id">
+            <label class="project-item">
+              <checkbox value="{{item.id}}" checked="{{item.checked}}" />
+              <view class="project-info">
+                <text class="project-name">{{item.title}}</text>
+                <text class="project-rate">{{item.value}} {{item.unit}}</text>
+              </view>
+            </label>
+            <view class="duration-input-wrap" wx:if="{{item.checked}}">
+              <input type="number" value="{{record.durations[item.id]}}" placeholder="{{item.inputUnit === '克' ? '重量' : '时长'}}" bindinput="inputDuration" data-id="{{item.id}}" />
+              <text>{{item.inputUnit}}</text>
+            </view>
+          </view>
+        </view>
+      </checkbox-group>
+    </view>
+    <button class="btn-submit" bindtap="submitRecord">{{selectedDateRecord ? '修改打卡记录' : '提交打卡记录'}}</button>
+  </view>
+
+  <!-- 今日成果 -->
+  <view class="card result-card" wx:if="{{selectedDateRecord}}">
+    <view class="card-title">{{selectedDate === today ? '今日' : selectedDate}}成果</view>
+    <view class="result-items">
+      <view class="result-item">
+        <text class="label">消耗卡路里</text>
+        <text class="value">{{selectedDateRecord.calories}} / {{goals.calories}} kcal</text>
+        <progress percent="{{selectedDateRecord.calories / goals.calories * 100}}" active stroke-width="6" border-radius="3" color="#2E5A42" />
+      </view>
+      <view class="result-item">
+        <text class="label">健康度</text>
+        <text class="value">{{selectedDateRecord.health}} / {{goals.health}} 点</text>
+        <progress percent="{{selectedDateRecord.health / goals.health * 100}}" active stroke-width="6" border-radius="3" color="#2E5A42" />
+      </view>
+      <view class="result-item">
+        <text class="label">修养度</text>
+        <text class="value">{{selectedDateRecord.cultivation}} / {{goals.cultivation}} 点</text>
+        <progress percent="{{selectedDateRecord.cultivation / goals.cultivation * 100}}" active stroke-width="6" border-radius="3" color="#2E5A42" />
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,167 @@
+.container {
+  background-color: #fff;
+  padding-bottom: 120rpx; /* 为底部操作栏留空间 */
+}
+
+.cover-box {
+  width: 100%;
+  height: 460rpx;
+  position: relative;
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  background-color: #E8F4EC;
+}
+
+.cover-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+}
+
+.title-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40rpx 30rpx;
+  color: #fff;
+}
+
+.title {
+  font-size: 44rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  text-shadow: 0 2rpx 4rpx rgba(0,0,0,0.5);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+}
+
+.tag {
+  font-size: 22rpx;
+  background: rgba(255,255,255,0.2);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  margin-right: 20rpx;
+  border: 1rpx solid rgba(255,255,255,0.4);
+}
+
+.date {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+.content-box {
+  padding: 40rpx 30rpx;
+}
+
+.intro-card {
+  background: #F8FBF8;
+  padding: 40rpx;
+  border-radius: 16rpx;
+  position: relative;
+  margin-bottom: 50rpx;
+}
+
+.quote-icon {
+  position: absolute;
+  top: 10rpx;
+  left: 20rpx;
+  font-size: 80rpx;
+  color: #DDEBE1;
+  font-family: serif;
+  line-height: 1;
+}
+
+.intro-text {
+  font-size: 28rpx;
+  color: #555;
+  line-height: 1.8;
+  position: relative;
+  z-index: 2;
+}
+
+.rich-content {
+  color: #333;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2E5A42;
+  margin-top: 40rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 12rpx;
+  height: 12rpx;
+  background: #2E5A42;
+  border-radius: 50%;
+  margin-right: 16rpx;
+}
+
+.paragraph {
+  font-size: 30rpx;
+  line-height: 1.8;
+  margin-bottom: 30rpx;
+  text-align: justify;
+}
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #fff;
+  box-shadow: 0 -4rpx 20rpx rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx;
+  justify-content: space-between;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #7A8F79;
+  padding: 10rpx 20rpx;
+}
+
+.action-icon {
+  font-size: 40rpx;
+  margin-bottom: 4rpx;
+}
+
+.action-text {
+  font-size: 22rpx;
+}
+
+.main-btn {
+  background: #2E5A42;
+  color: #fff;
+  font-size: 32rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  padding: 0 60rpx;
+  border-radius: 40rpx;
+  font-weight: bold;
+}
+
+.btn-ai {
+  background: #7A8F79;
+}

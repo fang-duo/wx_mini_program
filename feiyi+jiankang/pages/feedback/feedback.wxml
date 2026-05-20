@@ -1,0 +1,26 @@
+<view class="container">
+  <view class="form-box">
+    <view class="title">您遇到了什么问题或有什么建议？</view>
+    <textarea class="feedback-input" placeholder="请详细描述您的问题或建议，我们将尽快为您解决..." maxlength="500" bindinput="inputContent"></textarea>
+    <view class="word-count">{{content.length}}/500</view>
+    
+    <view class="contact-box">
+      <text class="label">联系方式：</text>
+      <input class="input" type="text" placeholder="请输入手机号或邮箱(选填)" bindinput="inputContact" />
+    </view>
+  </view>
+
+  <button class="btn-submit {{content.length > 0 ? 'active' : ''}}" bindtap="submitFeedback">提交反馈</button>
+
+  <view class="faq-section">
+    <view class="faq-title">常见问题</view>
+    <view class="faq-item" wx:for="{{faqs}}" wx:key="id" bindtap="toggleFaq" data-index="{{index}}">
+      <view class="faq-q">
+        <text class="q-icon">Q</text>
+        <text>{{item.q}}</text>
+        <text class="arrow {{item.open ? 'up' : ''}}">></text>
+      </view>
+      <view class="faq-a" wx:if="{{item.open}}">{{item.a}}</view>
+    </view>
+  </view>
+</view>

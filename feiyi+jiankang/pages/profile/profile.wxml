@@ -1,0 +1,63 @@
+<view class="container profile-container">
+  <view class="user-info-box bg-primary">
+    <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="chooseAvatar">
+      <image class="avatar" src="{{userInfo.avatarUrl || ''}}" mode="aspectFill" wx:if="{{userInfo.avatarUrl}}"></image>
+      <view class="default-avatar" wx:else>我</view>
+    </button>
+    <view class="info-text">
+      <input 
+        class="nickname-input" 
+        type="nickname"
+        placeholder="点击获取昵称"
+        value="{{userInfo.nickname}}"
+        bind:blur="onNicknameBlur"
+      />
+    </view>
+  </view>
+
+  <view class="menu-list">
+    <view class="menu-item" bindtap="handleMenuClick" data-title="账号信息管理">
+      <view class="menu-left">
+        <text class="menu-icon">👤</text>
+        <text class="menu-text">账号信息管理</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+    
+    <view class="menu-item" bindtap="handleMenuClick" data-title="我的收藏内容">
+      <view class="menu-left">
+        <text class="menu-icon">⭐</text>
+        <text class="menu-text">首页收藏</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+
+    <view class="menu-item" bindtap="handleMenuClick" data-title="AI问答收藏">
+      <view class="menu-left">
+        <text class="menu-icon">✉</text>
+        <text class="menu-text">AI问答收藏</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+    
+    <view class="menu-item" bindtap="handleMenuClick" data-title="帮助与反馈">
+      <view class="menu-left">
+        <text class="menu-icon">❓</text>
+        <text class="menu-text">帮助与反馈</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+
+    <view class="menu-item" bindtap="handleMenuClick" data-title="设置">
+      <view class="menu-left">
+        <text class="menu-icon">⚙</text>
+        <text class="menu-text">设置</text>
+      </view>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <view class="action-box">
+    <button class="btn-switch" bindtap="switchAccount">切换账号</button>
+  </view>
+</view>
