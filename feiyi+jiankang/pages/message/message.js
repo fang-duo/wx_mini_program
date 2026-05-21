@@ -1,3 +1,8 @@
+const {
+  loadAiFavoritesFromCloud,
+  removeAiFavoritesByIds
+} = require('../../utils/dataSync');
+
 const FAVORITES_COLLECTION = 'ai_favorites';
 
 Page({
@@ -22,16 +27,11 @@ Page({
       return;
     }
 
-    const db = wx.cloud.database();
-
     this.setData({ loading: true });
 
     try {
-      const res = await db.collection(FAVORITES_COLLECTION)
-        .orderBy('createTime', 'desc')
-        .get();
-
-      const messages = (res.data || []).map(item => ({
+      const cloudFavorites = await loadAiFavoritesFromCloud();
+      const messages = cloudFavorites.map(item => ({
         ...item,
         selected: false,
         date: this.formatTime(item.createTime)
@@ -133,13 +133,10 @@ Page({
   async deleteFavoritesByIds(ids, successTitle) {
     if (!ids.length || !wx.cloud) return;
 
-    const db = wx.cloud.database();
     wx.showLoading({ title: '处理中...' });
 
     try {
-      await Promise.all(
-        ids.map(id => db.collection(FAVORITES_COLLECTION).doc(id).remove())
-      );
+      await removeAiFavoritesByIds(ids);
 
       const messages = this.data.messages.filter(item => !ids.includes(item._id));
       this.setData({

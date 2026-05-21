@@ -1,3 +1,11 @@
+const {
+  buildFavoriteKey,
+  getContentFavoritesCache,
+  checkContentFavoriteInCloud,
+  saveContentFavoriteToCloud,
+  removeContentFavoriteFromCloud
+} = require('../../utils/dataSync');
+
 function normalizeMediaValue(value) {
   if (!value) return '';
   if (typeof value === 'string') return value;
@@ -273,39 +281,61 @@ Page({
     }
   },
 
-  checkStarStatus() {
-    const favorites = wx.getStorageSync('favorites') || [];
+  async checkStarStatus() {
     const currentKey = this.getFavoriteKey(this.data.article);
-    const isStarred = favorites.some(item => this.getFavoriteKey(item) === currentKey);
-    this.setData({ isStarred });
+    if (!currentKey) {
+      this.setData({ isStarred: false });
+      return;
+    }
+
+    const cachedFavorites = getContentFavoritesCache();
+    const cachedStarred = cachedFavorites.some(item => item.favoriteKey === currentKey);
+    this.setData({ isStarred: cachedStarred });
+
+    if (!wx.cloud) return;
+
+    try {
+      const cloudStarred = await checkContentFavoriteInCloud(currentKey);
+      this.setData({ isStarred: cloudStarred });
+    } catch (error) {
+      console.error('检查云端收藏状态失败：', error);
+    }
   },
 
   getFavoriteKey(item) {
-    return `${item.contentType || 'heritage'}::${item.id || item.detailId || item.title}`;
+    return buildFavoriteKey(item);
   },
 
-  toggleStar() {
-    let favorites = wx.getStorageSync('favorites') || [];
+  async toggleStar() {
     const isStarred = !this.data.isStarred;
     const currentItem = {
       ...this.data.article,
       favoriteKey: this.getFavoriteKey(this.data.article)
     };
 
-    if (isStarred) {
-      favorites.unshift(currentItem);
-    } else {
-      const currentKey = currentItem.favoriteKey;
-      favorites = favorites.filter(item => this.getFavoriteKey(item) !== currentKey);
+    wx.showLoading({ title: isStarred ? '收藏中...' : '取消中...' });
+
+    try {
+      if (isStarred) {
+        await saveContentFavoriteToCloud(currentItem);
+      } else {
+        await removeContentFavoriteFromCloud(currentItem.favoriteKey);
+      }
+
+      this.setData({ isStarred });
+      wx.showToast({
+        title: isStarred ? '已加入收藏' : '已取消收藏',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('切换内容收藏失败：', error);
+      wx.showToast({
+        title: '收藏同步失败，请稍后重试',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
-
-    wx.setStorageSync('favorites', favorites);
-
-    this.setData({ isStarred });
-    wx.showToast({
-      title: isStarred ? '已加入收藏' : '已取消收藏',
-      icon: 'success'
-    });
   },
 
   goToVideo() {

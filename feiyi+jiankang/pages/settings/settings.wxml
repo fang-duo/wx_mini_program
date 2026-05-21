@@ -4,10 +4,6 @@
       <text class="label">消息通知</text>
       <switch checked="{{notify}}" color="#2E5A42" bindchange="switchChange" data-type="notify" />
     </view>
-    <view class="settings-item">
-      <text class="label">深色模式跟随系统</text>
-      <switch checked="{{darkMode}}" color="#2E5A42" bindchange="switchChange" data-type="darkMode" />
-    </view>
   </view>
 
   <view class="settings-group">

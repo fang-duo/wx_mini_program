@@ -1,12 +1,35 @@
+const {
+  getContentFavoritesCache,
+  fetchContentFavoritesFromCloud
+} = require('../../utils/dataSync');
+
 Page({
   data: {
-    favorites: []
+    favorites: [],
+    loading: false
   },
 
-  onShow() {
-    // 每次显示页面时，从本地存储读取最新收藏列表
-    const favorites = wx.getStorageSync('favorites') || [];
-    this.setData({ favorites });
+  async onShow() {
+    const cachedFavorites = getContentFavoritesCache();
+    this.setData({ favorites: cachedFavorites });
+
+    if (!wx.cloud) return;
+
+    this.setData({ loading: true });
+    try {
+      const favorites = await fetchContentFavoritesFromCloud();
+      this.setData({ favorites });
+    } catch (error) {
+      console.error('加载首页收藏失败：', error);
+      if (!cachedFavorites.length) {
+        wx.showToast({
+          title: '云端收藏加载失败',
+          icon: 'none'
+        });
+      }
+    } finally {
+      this.setData({ loading: false });
+    }
   },
 
   goToDetail(e) {

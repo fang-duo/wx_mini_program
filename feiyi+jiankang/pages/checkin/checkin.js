@@ -1,3 +1,11 @@
+const {
+  LOCAL_KEYS,
+  loadCheckinGoalsFromCloud,
+  saveCheckinGoalsToCloud,
+  loadCheckinRecordsFromCloud,
+  saveCheckinRecordToCloud
+} = require('../../utils/dataSync');
+
 Page({
   data: {
     currentYear: new Date().getFullYear(),
@@ -62,23 +70,22 @@ Page({
   },
 
   async loadData() {
-    const goals = wx.getStorageSync('checkin_goals') || this.data.goals;
-    let historyRecords = wx.getStorageSync('checkin_history') || {};
+    let goals = wx.getStorageSync(LOCAL_KEYS.CHECKIN_GOALS) || this.data.goals;
+    let historyRecords = wx.getStorageSync(LOCAL_KEYS.CHECKIN_HISTORY) || {};
 
     if (wx.cloud) {
       try {
-        const db = wx.cloud.database();
-        const cloudRes = await db.collection('checkin_records').get();
-        
-        if (cloudRes.data.length > 0) {
-          const cloudHistory = {};
-          cloudRes.data.forEach(record => {
-            cloudHistory[record.date] = record;
-          });
-          historyRecords = { ...historyRecords, ...cloudHistory };
-          
-          wx.setStorageSync('checkin_history', historyRecords);
+        const cloudGoals = await loadCheckinGoalsFromCloud();
+        if (cloudGoals) {
+          goals = { ...goals, ...cloudGoals };
+          wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, goals);
         }
+      } catch (error) {
+        console.error('从云端加载打卡目标失败：', error);
+      }
+
+      try {
+        historyRecords = await this.syncMonthRecords(historyRecords);
       } catch (error) {
         console.error('从云端加载打卡记录失败：', error);
       }
@@ -90,6 +97,46 @@ Page({
     });
 
     this.loadRecordForDate(this.data.selectedDate);
+  },
+
+  async syncMonthRecords(baseHistory = {}) {
+    const cloudRecords = await loadCheckinRecordsFromCloud({
+      year: this.data.currentYear,
+      month: this.data.currentMonth
+    });
+
+    if (!cloudRecords.length) {
+      return baseHistory;
+    }
+
+    const cloudHistory = {};
+    cloudRecords.forEach(record => {
+      cloudHistory[record.date] = record;
+    });
+
+    const nextHistory = { ...baseHistory, ...cloudHistory };
+    wx.setStorageSync(LOCAL_KEYS.CHECKIN_HISTORY, nextHistory);
+    return nextHistory;
+  },
+
+  async refreshCurrentMonthRecords() {
+    if (!wx.cloud) {
+      this.generateCalendar();
+      this.loadRecordForDate(this.data.selectedDate);
+      return;
+    }
+
+    try {
+      const historyRecords = await this.syncMonthRecords(this.data.historyRecords);
+      this.setData({ historyRecords }, () => {
+        this.generateCalendar();
+        this.loadRecordForDate(this.data.selectedDate);
+      });
+    } catch (error) {
+      console.error('刷新当月打卡记录失败：', error);
+      this.generateCalendar();
+      this.loadRecordForDate(this.data.selectedDate);
+    }
   },
 
   loadRecordForDate(date) {
@@ -154,7 +201,9 @@ Page({
     } else {
       currentMonth--;
     }
-    this.setData({ currentYear, currentMonth }, () => this.generateCalendar());
+    this.setData({ currentYear, currentMonth }, () => {
+      this.refreshCurrentMonthRecords();
+    });
   },
 
   nextMonth() {
@@ -165,7 +214,9 @@ Page({
     } else {
       currentMonth++;
     }
-    this.setData({ currentYear, currentMonth }, () => this.generateCalendar());
+    this.setData({ currentYear, currentMonth }, () => {
+      this.refreshCurrentMonthRecords();
+    });
   },
 
   inputGoal(e) {
@@ -176,9 +227,21 @@ Page({
     });
   },
 
-  saveGoals() {
-    wx.setStorageSync('checkin_goals', this.data.goals);
-    wx.showToast({ title: '目标已保存', icon: 'success' });
+  async saveGoals() {
+    wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, this.data.goals);
+
+    if (!wx.cloud) {
+      wx.showToast({ title: '目标已保存', icon: 'success' });
+      return;
+    }
+
+    try {
+      await saveCheckinGoalsToCloud(this.data.goals);
+      wx.showToast({ title: '目标已同步', icon: 'success' });
+    } catch (error) {
+      console.error('保存打卡目标失败：', error);
+      wx.showToast({ title: '已先保存到本地', icon: 'none' });
+    }
   },
 
   inputWeight(e) {
@@ -247,7 +310,7 @@ Page({
     };
 
     const newHistory = { ...historyRecords, [selectedDate]: newRecord };
-    wx.setStorageSync('checkin_history', newHistory);
+    wx.setStorageSync(LOCAL_KEYS.CHECKIN_HISTORY, newHistory);
     
     this.setData({
       historyRecords: newHistory,
@@ -256,35 +319,19 @@ Page({
 
     this.generateCalendar();
 
+    let syncSuccess = !wx.cloud;
     if (wx.cloud) {
       try {
-        const db = wx.cloud.database();
-        const existingRecord = await db.collection('checkin_records').where({
-          date: selectedDate
-        }).get();
-
-        if (existingRecord.data.length > 0) {
-          await db.collection('checkin_records').doc(existingRecord.data[0]._id).update({
-            data: {
-              ...newRecord,
-              updateTime: db.serverDate()
-            }
-          });
-        } else {
-          await db.collection('checkin_records').add({
-            data: {
-              ...newRecord,
-              createTime: db.serverDate(),
-              updateTime: db.serverDate()
-            }
-          });
-        }
+        syncSuccess = await saveCheckinRecordToCloud(newRecord);
       } catch (error) {
         console.error('保存到云端失败：', error);
       }
     }
 
-    wx.showToast({ title: '打卡成功', icon: 'success' });
+    wx.showToast({
+      title: syncSuccess ? '打卡成功' : '已保存到本地',
+      icon: syncSuccess ? 'success' : 'none'
+    });
   },
 
   selectDate(e) {

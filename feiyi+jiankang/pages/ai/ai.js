@@ -4,6 +4,10 @@ const DEFAULT_MESSAGE = {
   content: '您好，我是非遗健康AI助手。请问有什么我可以帮您的？'
 };
 
+const {
+  saveAiFavoritesToCloud
+} = require('../../utils/dataSync');
+
 const EXIT_REMIND_DISABLED_KEY = 'ai_exit_remind_disabled';
 const FAVORITES_COLLECTION = 'ai_favorites';
 
@@ -279,25 +283,16 @@ Page({
       return;
     }
 
-    const db = wx.cloud.database();
-
     wx.showLoading({ title: '收藏中...' });
 
     try {
-      const results = await Promise.all(
-        selectedPairs.map(item => db.collection(FAVORITES_COLLECTION).add({
-          data: {
-            question: item.question,
-            answer: item.answer,
-            source: 'ai_chat',
-            createTime: db.serverDate()
-          }
-        }))
-      );
+      const results = await saveAiFavoritesToCloud(selectedPairs);
 
       const favoriteIdMap = {};
       selectedPairs.forEach((item, index) => {
-        favoriteIdMap[item.id] = results[index]._id;
+        if (results[index] && results[index]._id) {
+          favoriteIdMap[item.id] = results[index]._id;
+        }
       });
 
       const qaPairs = this.data.qaPairs.map(item => {

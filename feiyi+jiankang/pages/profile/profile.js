@@ -1,15 +1,38 @@
+const {
+  LOCAL_KEYS,
+  loadUserInfoFromCloud,
+  clearUserSessionCache,
+  getCurrentOpenId
+} = require('../../utils/dataSync');
+
 Page({
   data: {
-    userInfo: null
+    userInfo: {
+      nickname: '',
+      avatarUrl: ''
+    }
   },
 
-  onShow() {
+  async onShow() {
     const app = getApp();
-    const localUserInfo = wx.getStorageSync('local_user_info');
+    const localUserInfo = wx.getStorageSync(LOCAL_KEYS.USER_INFO);
     
     if (localUserInfo && localUserInfo.nickname) {
       this.setData({ userInfo: { ...localUserInfo } });
       app.globalData.userInfo = { ...localUserInfo };
+    }
+
+    if (!wx.cloud) return;
+
+    try {
+      const cloudUserInfo = await loadUserInfoFromCloud();
+      if (!cloudUserInfo) return;
+
+      this.setData({ userInfo: { ...cloudUserInfo } });
+      app.globalData.userInfo = { ...cloudUserInfo };
+      wx.setStorageSync(LOCAL_KEYS.USER_INFO, { ...cloudUserInfo });
+    } catch (error) {
+      console.error('加载云端用户信息失败：', error);
     }
   },
 
@@ -21,7 +44,7 @@ Page({
     this.setData({ userInfo: newUserInfo });
     getApp().globalData.userInfo = { ...newUserInfo };
     
-    wx.setStorageSync('local_user_info', newUserInfo);
+    wx.setStorageSync(LOCAL_KEYS.USER_INFO, newUserInfo);
     
     await this.saveUserToCloud(newUserInfo);
   },
@@ -30,21 +53,51 @@ Page({
     if (!wx.cloud) return null;
 
     const db = wx.cloud.database();
-    const _ = db.command;
-
     try {
+      const openid = await getCurrentOpenId();
+      const updatePayload = {
+        nickname: userInfo.nickname,
+        avatarUrl: userInfo.avatarUrl,
+        updateTime: db.serverDate()
+      };
+
+      if (openid) {
+        updatePayload.openid = openid;
+      }
+
       if (userInfo._id) {
         await db.collection('users').doc(userInfo._id).update({
-          data: {
-            nickname: userInfo.nickname,
-            avatarUrl: userInfo.avatarUrl,
-            updateTime: db.serverDate()
-          }
+          data: updatePayload
         });
         return { _id: userInfo._id };
       } else {
+        if (!openid) {
+          return null;
+        }
+
+        const existed = openid
+          ? await db.collection('users').where({ openid }).limit(1).get()
+          : { data: [] };
+
+        if (existed.data && existed.data.length) {
+          const existedDoc = existed.data[0];
+          await db.collection('users').doc(existedDoc._id).update({
+            data: updatePayload
+          });
+
+          getApp().globalData.userInfo._id = existedDoc._id;
+          this.setData({ 'userInfo._id': existedDoc._id });
+          wx.setStorageSync(LOCAL_KEYS.USER_INFO, {
+            ...getApp().globalData.userInfo,
+            _id: existedDoc._id
+          });
+
+          return { _id: existedDoc._id };
+        }
+
         const res = await db.collection('users').add({
           data: {
+            openid,
             nickname: userInfo.nickname,
             avatarUrl: userInfo.avatarUrl,
             createTime: db.serverDate(),
@@ -54,7 +107,7 @@ Page({
         
         getApp().globalData.userInfo._id = res._id;
         this.setData({ 'userInfo._id': res._id });
-        wx.setStorageSync('local_user_info', { ...getApp().globalData.userInfo });
+        wx.setStorageSync(LOCAL_KEYS.USER_INFO, { ...getApp().globalData.userInfo });
         
         return { _id: res._id };
       }
@@ -86,7 +139,7 @@ Page({
       this.setData({ userInfo: newUserInfo });
       getApp().globalData.userInfo = { ...newUserInfo };
       
-      wx.setStorageSync('local_user_info', newUserInfo);
+      wx.setStorageSync(LOCAL_KEYS.USER_INFO, newUserInfo);
       
       await this.saveUserToCloud(newUserInfo);
 
@@ -126,7 +179,9 @@ Page({
       content: '确定要切换当前账号吗？',
       success(res) {
         if (res.confirm) {
+          clearUserSessionCache();
           getApp().globalData.isLoggedIn = false;
+          getApp().globalData.openid = '';
           getApp().globalData.userInfo = null;
           wx.redirectTo({ url: '/pages/login/login' });
         }
@@ -140,7 +195,9 @@ Page({
       content: '确定要退出当前账号吗？',
       success(res) {
         if (res.confirm) {
+          clearUserSessionCache();
           getApp().globalData.isLoggedIn = false;
+          getApp().globalData.openid = '';
           getApp().globalData.userInfo = null;
           wx.redirectTo({ url: '/pages/login/login' });
         }

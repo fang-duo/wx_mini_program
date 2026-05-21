@@ -17,13 +17,25 @@ App({
     if (localUserInfo && localUserInfo.nickname && localUserInfo.nickname !== '点击获取昵称' && localUserInfo.nickname !== '体验用户') {
       this.globalData.userInfo = { ...localUserInfo }
     }
+
+    const appPreferences = wx.getStorageSync('app_preferences')
+    if (appPreferences && typeof appPreferences === 'object') {
+      this.globalData.appPreferences = {
+        ...this.globalData.appPreferences,
+        ...appPreferences
+      }
+    }
   },
 
   globalData: {
+    openid: '',
     userInfo: { 
       nickname: '', 
       avatarUrl: ''
     },
-    isLoggedIn: true
+    isLoggedIn: true,
+    appPreferences: {
+      notify: true
+    }
   }
 })
