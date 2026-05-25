@@ -1,0 +1,52 @@
+<view class="container">
+  <!-- 顶部 Banner/轮播图 -->
+  <swiper class="banner" indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#2E5A42">
+    <swiper-item wx:for="{{banners}}" wx:key="id">
+      <view class="banner-item bg-secondary">
+        <image class="banner-img" src="{{item.img}}" mode="aspectFill" />
+        <view class="banner-text">{{item.title}}</view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 四大分类模块 -->
+  <view class="section">
+    <view class="section-title">非遗传承</view>
+    <view class="category-grid">
+      <view class="category-item" wx:for="{{categories}}" wx:key="id" bindtap="goToCategory" data-id="{{item.id}}">
+        <view class="icon-wrap">
+          <text class="iconfont">{{item.iconText}}</text>
+        </view>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 每日推荐 (可选加分) -->
+  <view class="section recommend-daily">
+    <view class="section-title">每日推荐</view>
+    <view class="daily-card">
+      <view class="daily-title">{{dailyRecommend.title || '今日养生建议'}}</view>
+      <view class="daily-desc">{{dailyRecommend.summary || '今日推荐内容整理中，稍后将在这里展示。'}}</view>
+      <view class="daily-btn" bindtap="goToDetail" data-title="{{dailyRecommend.title}}" data-item-id="{{dailyRecommend.id}}" data-content-type="{{dailyRecommend.contentType}}">去练习 ></view>
+    </view>
+  </view>
+
+  <!-- 最新活动与宣传 -->
+  <view class="section">
+    <view class="section-title">最新活动与宣传</view>
+    <view class="article-list">
+      <view class="article-item" wx:for="{{articles}}" wx:key="id" bindtap="goToDetail" data-title="{{item.title}}" data-item-id="{{item.id}}" data-content-type="{{item.contentType}}">
+        <image class="article-img" src="{{item.cover}}" mode="aspectFill"></image>
+        <view class="article-info">
+          <view class="article-title">{{item.title}}</view>
+          <view class="article-desc">{{item.desc}}</view>
+          <view class="article-meta">
+            <text class="tag">{{item.tag}}</text>
+            <text class="date">{{item.date}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

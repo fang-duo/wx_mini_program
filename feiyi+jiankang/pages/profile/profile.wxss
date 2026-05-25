@@ -1,0 +1,158 @@
+.profile-container {
+  background-color: #F8FBF8;
+  height: 100vh;
+}
+
+.user-info-box {
+  display: flex;
+  align-items: center;
+  padding: 60rpx 40rpx 80rpx;
+  color: #fff;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+  box-shadow: 0 10rpx 30rpx rgba(46, 90, 66, 0.2);
+}
+
+.avatar-btn {
+  width: 140rpx !important;
+  height: 140rpx !important;
+  min-width: 140rpx !important;
+  min-height: 140rpx !important;
+  border-radius: 50% !important;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.226);
+  margin-right: 60rpx;
+  border: 4rpx solid rgba(255, 255, 255, 0.432);
+  position: relative;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 100rpx;
+  font-size: 0;
+  box-shadow: none !important;
+}
+
+.avatar-btn::after {
+  border: none !important;
+  border-radius: 50% !important;
+  width: 100rpx !important;
+  height: 100rpx !important;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+}
+
+.default-avatar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.info-text {
+  flex: 1;
+  padding-left: 36rpx;
+}
+
+.nickname-input {
+  font-size: 44rpx !important;
+  font-weight: bold !important;
+  color: #fff !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  padding: 10rpx 0 !important;
+  margin-bottom: 10rpx !important;
+  line-height: 70rpx !important;
+  height: 70rpx !important;
+  box-sizing: content-box !important;
+  box-shadow: none !important;
+  text-align: left !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.nickname-input::placeholder {
+  color: #000 !important;
+  font-weight: bold !important;
+}
+
+.menu-list {
+  background-color: #fff;
+  margin: -40rpx 30rpx 40rpx;
+  border-radius: 20rpx;
+  padding: 10rpx 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+  position: relative;
+  z-index: 2;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 0;
+  border-bottom: 2rpx solid #F2F6F0;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  font-size: 36rpx;
+  color: #7A8F79;
+  margin-right: 20rpx;
+  width: 40rpx;
+  text-align: center;
+}
+
+.menu-text {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.arrow {
+  color: #CCC;
+  font-size: 28rpx;
+  font-family: monospace;
+}
+
+.action-box {
+  padding: 0 30rpx;
+  margin-top: 60rpx;
+}
+
+.btn-switch, .btn-logout {
+  width: 100%;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  padding: 20rpx 0;
+  margin-bottom: 30rpx;
+}
+
+.btn-switch {
+  background-color: #fff;
+  color: #2E5A42;
+  border: 2rpx solid #2E5A42;
+}
+
+.btn-logout {
+  background-color: #E8F4EC;
+  color: #E05D5D;
+}

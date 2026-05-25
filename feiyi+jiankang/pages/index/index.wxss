@@ -1,0 +1,196 @@
+.container {
+  padding: 20rpx;
+}
+
+.banner {
+  height: 360rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 40rpx;
+  box-shadow: 0 8rpx 20rpx rgba(46, 90, 66, 0.1);
+}
+
+.banner-item {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.banner-img {
+  width: 100%;
+  height: 100%;
+  background-color: #DDEBE1;
+}
+
+.banner-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  color: #fff;
+  font-size: 32rpx;
+}
+
+.section {
+  margin-bottom: 40rpx;
+  background: #fff;
+  padding: 30rpx;
+  border-radius: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #2E5A42;
+  margin-bottom: 30rpx;
+  display: flex;
+  align-items: center;
+}
+
+.section-title::before {
+  content: '';
+  width: 8rpx;
+  height: 36rpx;
+  background: #2E5A42;
+  border-radius: 4rpx;
+  margin-right: 16rpx;
+}
+
+/* 每日推荐样式 */
+.recommend-daily .daily-card {
+  background: linear-gradient(135deg, #F2F6F0 0%, #E8F4EC 100%);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  position: relative;
+}
+
+.daily-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2E5A42;
+  margin-bottom: 16rpx;
+}
+
+.daily-desc {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 20rpx;
+}
+
+.daily-btn {
+  font-size: 24rpx;
+  color: #fff;
+  background: #2E5A42;
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  border-radius: 30rpx;
+}
+
+.category-grid {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.category-item {
+  width: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.icon-wrap {
+  width: 100rpx;
+  height: 100rpx;
+  background: #F2F6F0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.iconfont {
+  font-size: 48rpx;
+  color: #2E5A42;
+  font-family: serif; /* 模拟古风文字图标 */
+}
+
+.category-name {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.article-item {
+  display: flex;
+  margin-bottom: 30rpx;
+  padding-bottom: 30rpx;
+  border-bottom: 2rpx solid #F2F6F0;
+}
+
+.article-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.article-img {
+  width: 220rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  background: #E8F4EC;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.article-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.article-title {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.article-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 10rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.tag {
+  font-size: 20rpx;
+  color: #7A8F79;
+  background: #F2F6F0;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+}
+
+.date {
+  font-size: 22rpx;
+  color: #CCC;
+}

@@ -1,0 +1,49 @@
+<view class="container">
+  <view class="header-actions" wx:if="{{messages.length > 0}}">
+    <view class="select-all" wx:if="{{isBatchMode}}" bindtap="toggleSelectAll">
+      <icon type="{{isAllSelected ? 'success' : 'circle'}}" size="20" color="{{isAllSelected ? '#2E5A42' : '#999'}}"></icon>
+      <text>全选</text>
+    </view>
+    <view class="mode-switch" bindtap="toggleBatchMode">
+      {{isBatchMode ? '取消' : '批量管理'}}
+    </view>
+  </view>
+
+  <view class="message-list" wx:if="{{messages.length > 0}}">
+    <view class="message-item {{item.selected ? 'selected' : ''}}" wx:for="{{messages}}" wx:key="_id" bindtap="onItemClick" data-index="{{index}}">
+      <view class="select-icon" wx:if="{{isBatchMode}}">
+        <icon type="{{item.selected ? 'success' : 'circle'}}" size="20" color="{{item.selected ? '#2E5A42' : '#999'}}"></icon>
+      </view>
+      
+      <view class="msg-body">
+        <view class="msg-header">
+          <text class="msg-date">{{item.date}}</text>
+          <view class="fav-btn" catchtap="removeFavorite" data-id="{{item._id}}">
+            <text class="fav-icon active">★</text>
+          </view>
+        </view>
+        <view class="msg-content">
+          <view class="msg-question">
+            <text class="q-icon">问</text>
+            <text class="q-text">{{item.question}}</text>
+          </view>
+          <view class="msg-answer" wx:if="{{item.answer}}">
+            <text class="a-icon">答</text>
+            <text class="a-text">{{item.answer}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-icon">✉</view>
+    <text>{{loading ? '收藏加载中...' : '暂无 AI 问答收藏'}}</text>
+    <button class="btn-go-ai" bindtap="goToAI">去问问 AI</button>
+  </view>
+
+  <view class="batch-bar {{isBatchMode ? 'show' : ''}}">
+    <view class="batch-info">已选 {{selectedCount}} 项</view>
+    <button class="btn-delete-batch" bindtap="deleteSelected">批量删除</button>
+  </view>
+</view>

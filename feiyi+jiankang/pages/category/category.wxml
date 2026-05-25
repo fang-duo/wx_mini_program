@@ -1,0 +1,24 @@
+<view class="container">
+  <view class="header bg-primary">
+    <view class="header-title">{{title}}</view>
+    <view class="header-desc">{{desc}}</view>
+  </view>
+
+  <view class="list-container">
+    <view class="card-item" wx:for="{{list}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}" data-title="{{item.title}}" data-content-type="{{item.contentType}}">
+      <image class="card-img" src="{{item.cover}}" mode="aspectFill"></image>
+      <view class="card-content">
+        <view class="card-title">{{item.title}}</view>
+        <view class="card-desc">{{item.desc}}</view>
+        <view class="card-bottom">
+          <text class="tag">{{item.tag}}</text>
+          <text class="btn-text">查看详情 ></text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{list.length === 0}}">
+    <text>更多内容正在整理中，敬请期待...</text>
+  </view>
+</view>

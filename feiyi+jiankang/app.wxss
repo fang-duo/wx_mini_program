@@ -1,0 +1,22 @@
+/**app.wxss**/
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  background-color: #F8FBF8;
+  color: #333333;
+  box-sizing: border-box;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 清新古风通用颜色 */
+.text-primary { color: #2E5A42; } /* 深松绿 */
+.text-secondary { color: #7A8F79; } /* 浅绿 */
+.bg-primary { background-color: #2E5A42; }
+.bg-secondary { background-color: #E8F4EC; }

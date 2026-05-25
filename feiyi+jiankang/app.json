@@ -1,0 +1,57 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/checkin/checkin",
+    "pages/ai/ai",
+    "pages/profile/profile",
+    "pages/video-play/video-play",
+    "pages/login/login",
+    "pages/category/category",
+    "pages/detail/detail",
+    "pages/account/account",
+    "pages/favorites/favorites",
+    "pages/message/message",
+    "pages/feedback/feedback",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F2F6F0",
+    "navigationBarTitleText": "遗韵养生",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#7A8F79",
+    "selectedColor": "#2E5A42",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home.png"
+      },
+      {
+        "pagePath": "pages/checkin/checkin",
+        "text": "健康打卡",
+        "iconPath": "images/calendar.png",
+        "selectedIconPath": "images/calendar.png"
+      },
+      {
+        "pagePath": "pages/ai/ai",
+        "text": "AI问答",
+        "iconPath": "images/ai.png",
+        "selectedIconPath": "images/ai-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "个人中心",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
