@@ -1,0 +1,233 @@
+.container {
+  padding: 20rpx;
+  background-color: #F8F9F7;
+  min-height: 100vh;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2E5A42;
+  margin-bottom: 20rpx;
+  border-left: 8rpx solid #2E5A42;
+  padding-left: 16rpx;
+}
+
+/* 日历样式 */
+.calendar-card {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 20rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.05);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 40rpx;
+  font-weight: bold;
+  color: #2E5A42;
+}
+
+.weeks {
+  display: flex;
+  justify-content: space-around;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.weeks view {
+  font-size: 24rpx;
+  color: #999;
+  width: 14.28%;
+  text-align: center;
+}
+
+.days {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10rpx 0;
+}
+
+.day-item {
+  width: 14.28%;
+  height: 100rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 28rpx;
+  position: relative;
+  box-sizing: border-box;
+  border: 2rpx solid transparent;
+}
+
+.day-item.normal {
+  color: #333;
+}
+
+.day-item.checked {
+  background-color: #e8f5e9;
+  border: 2rpx solid #4caf50;
+  color: #2e7d32;
+  border-radius: 12rpx;
+}
+
+.day-item.today {
+  color: #2E5A42;
+  font-weight: bold;
+}
+
+.dot {
+  width: 8rpx;
+  height: 8rpx;
+  background-color: #4caf50;
+  border-radius: 50%;
+  margin-top: 4rpx;
+}
+
+/* 目标设置 */
+.goal-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.goal-item text {
+  font-size: 28rpx;
+  color: #666;
+  width: 180rpx;
+}
+
+.goal-item input {
+  flex: 1;
+  border-bottom: 1rpx solid #ddd;
+  padding: 10rpx;
+  margin: 0 20rpx;
+  text-align: center;
+}
+
+.btn-save-goal {
+  background-color: #7A8F79;
+  color: white;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  margin-top: 20rpx;
+}
+
+/* 表单样式 */
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-item > text {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.form-item input {
+  background: #f5f5f5;
+  padding: 20rpx;
+  border-radius: 10rpx;
+}
+
+.project-item-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.project-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20rpx;
+}
+
+.project-name {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.project-rate {
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.duration-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #f0f0f0;
+  padding: 10rpx 20rpx;
+  border-radius: 30rpx;
+  margin-left: 20rpx;
+}
+
+.duration-input-wrap input {
+  width: 80rpx;
+  text-align: center;
+  font-size: 26rpx;
+  color: #2E5A42;
+  background: transparent;
+  padding: 0;
+}
+
+.duration-input-wrap text {
+  font-size: 24rpx;
+  color: #666;
+  margin-left: 10rpx;
+}
+
+.btn-submit {
+  background-color: #2E5A42;
+  color: white;
+  border-radius: 50rpx;
+  margin-top: 40rpx;
+}
+
+/* 成果展示 */
+.result-item {
+  margin-bottom: 24rpx;
+}
+
+.result-item .label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.result-item .value {
+  float: right;
+  font-size: 26rpx;
+  color: #2E5A42;
+  font-weight: bold;
+}
+
+progress {
+  margin-top: 10rpx;
+}

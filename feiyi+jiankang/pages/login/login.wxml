@@ -1,0 +1,50 @@
+<view class="container">
+  <!-- 顶部装饰图/标题 -->
+  <view class="header">
+    <view class="title">遗韵养生</view>
+    <view class="subtitle">传承非遗，守护健康</view>
+  </view>
+
+  <view class="card">
+    <view class="tabs">
+      <view class="tab {{currentTab === 'login' ? 'active' : ''}}" bindtap="switchTab" data-tab="login">登录</view>
+      <view class="tab {{currentTab === 'register' ? 'active' : ''}}" bindtap="switchTab" data-tab="register">注册</view>
+    </view>
+
+    <!-- 登录表单 -->
+    <view class="form-box" wx:if="{{currentTab === 'login'}}">
+      <view class="input-group">
+        <text class="label">手机号</text>
+        <input class="input" type="number" placeholder="请输入手机号" bindinput="inputPhone" />
+      </view>
+      <view class="input-group">
+        <text class="label">密  码</text>
+        <input class="input" type="password" placeholder="请输入密码" bindinput="inputPassword" />
+      </view>
+      <view class="forgot-pwd" bindtap="goToForgot">忘记密码？</view>
+      <button class="btn-primary" bindtap="handleLogin">登 录</button>
+    </view>
+
+    <!-- 注册/找回表单 -->
+    <view class="form-box" wx:if="{{currentTab === 'register' || currentTab === 'forgot'}}">
+      <view class="form-title" wx:if="{{currentTab === 'forgot'}}">找回密码</view>
+      <view class="input-group">
+        <text class="label">手机号</text>
+        <input class="input" type="number" placeholder="请输入手机号" bindinput="inputPhone" />
+      </view>
+      <view class="input-group code-group">
+        <text class="label">验证码</text>
+        <input class="input" type="number" placeholder="输入验证码" bindinput="inputCode" />
+        <view class="btn-code" bindtap="sendCode">获取验证码</view>
+      </view>
+      <view class="input-group">
+        <text class="label">新密码</text>
+        <input class="input" type="password" placeholder="设置新密码" bindinput="inputPassword" />
+      </view>
+      <button class="btn-primary" bindtap="handleRegisterOrReset">
+        {{currentTab === 'register' ? '注 册' : '重 置 密 码'}}
+      </button>
+      <view class="back-login" wx:if="{{currentTab === 'forgot'}}" bindtap="switchTab" data-tab="login">返回登录</view>
+    </view>
+  </view>
+</view>

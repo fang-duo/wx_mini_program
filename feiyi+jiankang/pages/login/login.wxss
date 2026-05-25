@@ -1,0 +1,131 @@
+.container {
+  background-color: #F2F6F0;
+  min-height: 100vh;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 80rpx;
+}
+
+.title {
+  font-size: 56rpx;
+  color: #2E5A42;
+  font-weight: bold;
+  letter-spacing: 4rpx;
+  margin-bottom: 20rpx;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #7A8F79;
+}
+
+.card {
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  box-shadow: 0 10rpx 30rpx rgba(46, 90, 66, 0.05);
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 60rpx;
+  border-bottom: 2rpx solid #E8F4EC;
+}
+
+.tab {
+  font-size: 32rpx;
+  color: #999;
+  padding-bottom: 20rpx;
+  position: relative;
+}
+
+.tab.active {
+  color: #2E5A42;
+  font-weight: bold;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  left: 20%;
+  width: 60%;
+  height: 4rpx;
+  background-color: #2E5A42;
+  border-radius: 2rpx;
+}
+
+.form-title {
+  font-size: 36rpx;
+  color: #2E5A42;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.input-group {
+  margin-bottom: 40rpx;
+  border-bottom: 2rpx solid #E8F4EC;
+  display: flex;
+  align-items: center;
+  padding-bottom: 10rpx;
+}
+
+.code-group {
+  position: relative;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #2E5A42;
+  width: 120rpx;
+}
+
+.input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.btn-code {
+  position: absolute;
+  right: 0;
+  bottom: 20rpx;
+  font-size: 24rpx;
+  color: #7A8F79;
+  padding: 10rpx 20rpx;
+  background: #F2F6F0;
+  border-radius: 30rpx;
+}
+
+.forgot-pwd {
+  text-align: right;
+  font-size: 24rpx;
+  color: #7A8F79;
+  margin-bottom: 40rpx;
+}
+
+.btn-primary {
+  background-color: #2E5A42;
+  color: #fff;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  padding: 20rpx 0;
+  box-shadow: 0 10rpx 20rpx rgba(46, 90, 66, 0.2);
+}
+
+.back-login {
+  text-align: center;
+  font-size: 24rpx;
+  color: #7A8F79;
+  margin-top: 30rpx;
+}

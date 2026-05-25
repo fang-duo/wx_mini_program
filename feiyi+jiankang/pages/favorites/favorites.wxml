@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="list-container" wx:if="{{favorites.length > 0}}">
+    <view class="card-item" wx:for="{{favorites}}" wx:key="favoriteKey" bindtap="goToDetail" data-title="{{item.title}}" data-item-id="{{item.id}}" data-content-type="{{item.contentType}}">
+      <image class="card-img" src="{{item.cover}}" mode="aspectFill"></image>
+      <view class="card-content">
+        <view class="card-title">{{item.title}}</view>
+        <view class="card-bottom">
+          <text class="tag">{{item.tag}}</text>
+          <text class="date">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-icon">⭐</view>
+    <text>暂无收藏内容，快去探索非遗吧</text>
+  </view>
+</view>

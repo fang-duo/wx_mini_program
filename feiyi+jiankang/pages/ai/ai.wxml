@@ -1,0 +1,87 @@
+<view class="container">
+  <view class="session-tip" wx:if="{{!remindDisabled}}">
+    <text class="session-tip-text">离开页面后，未收藏的 AI 问答会清空，请及时收藏重要内容。</text>
+    <text class="session-tip-action" bindtap="disableExitReminder">以后不再提醒</text>
+  </view>
+
+  <view class="header-actions" wx:if="{{qaPairs.length > 0}}">
+    <view class="select-all" wx:if="{{isBatchMode}}" bindtap="toggleSelectAll">
+      <icon type="{{isAllSelected ? 'success' : 'circle'}}" size="20" color="{{isAllSelected ? '#2E5A42' : '#999'}}"></icon>
+      <text>全选</text>
+    </view>
+    <view class="header-action-group">
+      <text class="header-link" bindtap="goToFavorites">查看收藏</text>
+      <text class="header-link" bindtap="toggleBatchMode">{{isBatchMode ? '取消' : '多选收藏'}}</text>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="chat-list" scroll-into-view="{{scrollToMessage}}">
+    <view class="ai-header" wx:if="{{messages.length <= 1}}">
+      <view class="ai-avatar-large">AI</view>
+      <text class="ai-welcome-text">您好，我是非遗健康AI助手。请问有什么我可以帮您的？</text>
+    </view>
+
+    <view class="recommend-section" wx:if="{{messages.length <= 1}}">
+      <view class="recommend-title">
+        <text class="title-icon">猜您想问：</text>
+      </view>
+      <view class="recommend-cards">
+        <view 
+          wx:for="{{recommends}}" 
+          wx:key="*this" 
+          class="recommend-card" 
+          bindtap="onSendTag" 
+          data-text="{{item}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <view class="message-container" wx:if="{{messages.length > 1}}">
+      <view 
+        wx:for="{{messages}}" 
+        wx:key="id" 
+        id="msg-{{item.id}}"
+        class="msg-box {{item.role}} {{item.pairSelected ? 'selected' : ''}}"
+        bindtap="onMessageTap"
+        data-pair-id="{{item.pairId}}"
+      >
+        <view
+          class="select-icon"
+          wx:if="{{isBatchMode && item.role === 'ai' && item.pairSelectable}}"
+        >
+          <icon
+            type="{{item.pairSelected ? 'success' : 'circle'}}"
+            size="20"
+            color="{{item.pairSelected ? '#2E5A42' : '#999'}}"
+          ></icon>
+        </view>
+        <view class="avatar-small" wx:if="{{item.role === 'ai'}}">AI</view>
+        <view class="content {{item.pairIsFavorite ? 'favorited' : ''}}">
+          <text user-select>{{item.content}}</text>
+          <view class="favorite-tag" wx:if="{{item.role === 'ai' && item.pairIsFavorite}}">已收藏</view>
+        </view>
+      </view>
+    </view>
+    
+    <view class="scroll-bottom-hold"></view>
+  </scroll-view>
+
+  <view class="batch-bar {{isBatchMode ? 'show' : ''}}">
+    <view class="batch-info">已选 {{selectedCount}} 项</view>
+    <button class="btn-save-batch" bindtap="saveSelectedFavorites">收藏所选</button>
+  </view>
+
+  <view class="input-area">
+    <input 
+      class="rounded-input"
+      bindinput="onInput" 
+      value="{{inputValue}}" 
+      placeholder="输入关于非遗或健康的问题..." 
+      confirm-type="send"
+      bindconfirm="onSend"
+    />
+    <button bindtap="onSend" class="send-btn">发送</button>
+  </view>
+</view>

@@ -1,0 +1,199 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f9fb;
+}
+
+.session-tip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #eef6f1;
+  border-bottom: 1rpx solid #dbe8df;
+}
+
+.session-tip-text {
+  flex: 1;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: #557364;
+  margin-right: 20rpx;
+}
+
+.session-tip-action {
+  flex-shrink: 0;
+  color: #2a5d4d;
+  font-size: 24rpx;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #eef1f4;
+}
+
+.select-all {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.select-all text {
+  margin-left: 10rpx;
+}
+
+.header-action-group {
+  display: flex;
+  align-items: center;
+}
+
+.header-link {
+  font-size: 26rpx;
+  color: #2a5d4d;
+  font-weight: 600;
+  margin-left: 20rpx;
+}
+
+.chat-list { flex: 1; }
+.scroll-bottom-hold { height: 260rpx; }
+
+/* 顶部大头像区 */
+.ai-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 40rpx 40rpx;
+}
+
+.ai-avatar-large {
+  width: 140rpx;
+  height: 140rpx;
+  background-color: #2a5d4d;
+  color: white;
+  border-radius: 50%;
+  font-size: 50rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20rpx;
+}
+
+.ai-welcome-text {
+  font-size: 30rpx;
+  color: #666;
+  text-align: center;
+}
+
+/* 快捷建议卡片 */
+.recommend-section { padding: 20rpx 40rpx; }
+.recommend-title { margin-bottom: 20rpx; font-weight: bold; color: #2a5d4d; }
+.recommend-card {
+  background: white;
+  padding: 25rpx;
+  border-radius: 15rpx;
+  margin-bottom: 15rpx;
+  font-size: 28rpx;
+  color: #333;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.03);
+}
+
+/* 聊天气泡 */
+.msg-box { display: flex; align-items: flex-start; padding: 20rpx; margin-bottom: 10rpx; }
+.msg-box.selected .content {
+  border: 2rpx solid #2a5d4d;
+  background: #edf6f0;
+}
+
+.select-icon {
+  margin-right: 12rpx;
+  padding-top: 14rpx;
+}
+
+.avatar-small {
+  width: 60rpx; height: 60rpx; background: #2a5d4d; color: white;
+  border-radius: 50%; font-size: 20rpx; display: flex; align-items: center;
+  justify-content: center; margin-right: 20rpx;
+}
+.content {
+  padding: 20rpx;
+  border-radius: 15rpx;
+  max-width: 70%;
+  font-size: 28rpx;
+  border: 2rpx solid transparent;
+  position: relative;
+}
+
+.ai .content { background: white; }
+.user { justify-content: flex-end; }
+.user .content { background: #2a5d4d; color: white; }
+
+.content.favorited {
+  border-color: #f0cf67;
+  background: #fffdf4;
+}
+
+.favorite-tag {
+  margin-top: 16rpx;
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 18rpx;
+  border-radius: 999rpx;
+  background: #fff1b8;
+  color: #8a6500;
+  font-size: 22rpx;
+}
+
+/* 底部输入框 */
+.input-area {
+  padding: 20rpx 30rpx 60rpx; background: white; display: flex; align-items: center;
+}
+.rounded-input {
+  flex: 1; height: 80rpx; background: #f3f5f7; border-radius: 40rpx; padding: 0 30rpx;
+}
+.send-btn {
+  width: 120rpx !important; height: 80rpx; background: #2a5d4d; color: white;
+  border-radius: 40rpx; margin-left: 20rpx; font-size: 28rpx; line-height: 80rpx; padding: 0;
+}
+
+.batch-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: -120rpx;
+  height: 100rpx;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30rpx;
+  box-shadow: 0 -6rpx 20rpx rgba(0, 0, 0, 0.08);
+  transition: bottom 0.3s;
+  z-index: 50;
+}
+
+.batch-bar.show {
+  bottom: 160rpx;
+}
+
+.batch-info {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.btn-save-batch {
+  margin: 0;
+  padding: 0 36rpx;
+  height: 68rpx;
+  line-height: 68rpx;
+  border-radius: 999rpx;
+  background: #2a5d4d;
+  color: #fff;
+  font-size: 26rpx;
+}

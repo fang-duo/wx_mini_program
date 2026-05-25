@@ -1,0 +1,17 @@
+<view class="video-container">
+  <video
+    wx:if="{{finalUrl}}"
+    class="video-player"
+    src="{{finalUrl}}"
+    poster="{{cover}}"
+    controls
+    autoplay
+    binderror="handleVideoError"
+  ></video>
+
+  <view class="video-info" wx:if="{{title || loading || errorMessage}}">
+    <view class="video-title" wx:if="{{title}}">{{title}}</view>
+    <view class="video-desc" wx:if="{{loading}}">视频加载中，请稍候...</view>
+    <view class="video-desc error-text" wx:if="{{errorMessage}}">{{errorMessage}}</view>
+  </view>
+</view>
