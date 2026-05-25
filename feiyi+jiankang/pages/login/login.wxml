@@ -1,50 +1,70 @@
-<view class="container">
-  <!-- 顶部装饰图/标题 -->
+<view class="container login-container">
   <view class="header">
-    <view class="title">遗韵养生</view>
+    <view class="title">欢迎进入遗韵养生</view>
     <view class="subtitle">传承非遗，守护健康</view>
   </view>
 
   <view class="card">
-    <view class="tabs">
-      <view class="tab {{currentTab === 'login' ? 'active' : ''}}" bindtap="switchTab" data-tab="login">登录</view>
-      <view class="tab {{currentTab === 'register' ? 'active' : ''}}" bindtap="switchTab" data-tab="register">注册</view>
-    </view>
+    <button class="btn-primary btn-wechat" bindtap="handleLogin" loading="{{loading}}" disabled="{{loading}}">
+      <text class="btn-icon">
+        <text class="icon-wechat">
+          <view class="wechat-icon">
+            <view class="wechat-circle"></view>
+            <view class="wechat-inner">
+              <view class="wechat-left"></view>
+              <view class="wechat-right"></view>
+            </view>
+          </view>
+        </text>
+      </text>
+      微信一键进入
+    </button>
 
-    <!-- 登录表单 -->
-    <view class="form-box" wx:if="{{currentTab === 'login'}}">
-      <view class="input-group">
-        <text class="label">手机号</text>
-        <input class="input" type="number" placeholder="请输入手机号" bindinput="inputPhone" />
-      </view>
-      <view class="input-group">
-        <text class="label">密  码</text>
-        <input class="input" type="password" placeholder="请输入密码" bindinput="inputPassword" />
-      </view>
-      <view class="forgot-pwd" bindtap="goToForgot">忘记密码？</view>
-      <button class="btn-primary" bindtap="handleLogin">登 录</button>
-    </view>
+    <button class="btn-secondary" bindtap="handleSkip" loading="{{loading}}" disabled="{{loading}}">
+      稍后完善资料
+    </button>
+  </view>
 
-    <!-- 注册/找回表单 -->
-    <view class="form-box" wx:if="{{currentTab === 'register' || currentTab === 'forgot'}}">
-      <view class="form-title" wx:if="{{currentTab === 'forgot'}}">找回密码</view>
-      <view class="input-group">
-        <text class="label">手机号</text>
-        <input class="input" type="number" placeholder="请输入手机号" bindinput="inputPhone" />
+  <view class="footer">
+    <view class="policy-links">
+      <text class="policy-link" bindtap="openPrivacy">隐私政策</text>
+      <text class="policy-divider">|</text>
+      <text class="policy-link" bindtap="openAgreement">用户协议</text>
+    </view>
+  </view>
+</view>
+
+<view class="modal-overlay" wx:if="{{showAvatarModal}}" bindtap="cancelAvatarModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-title">选择头像</view>
+    <view class="modal-list">
+      <view class="modal-item" bindtap="selectWechatAvatar" wx:if="{{userInfo.avatarUrl}}">
+        <view class="avatar-preview" style="background-image: url({{userInfo.avatarUrl}})"></view>
+        <text class="modal-item-text">用微信头像</text>
       </view>
-      <view class="input-group code-group">
-        <text class="label">验证码</text>
-        <input class="input" type="number" placeholder="输入验证码" bindinput="inputCode" />
-        <view class="btn-code" bindtap="sendCode">获取验证码</view>
+      <view class="modal-item" bindtap="selectFromAlbum">
+        <text class="modal-item-text">从相册选择</text>
       </view>
-      <view class="input-group">
-        <text class="label">新密码</text>
-        <input class="input" type="password" placeholder="设置新密码" bindinput="inputPassword" />
+      <view class="modal-item" bindtap="takePhoto">
+        <text class="modal-item-text">拍照</text>
       </view>
-      <button class="btn-primary" bindtap="handleRegisterOrReset">
-        {{currentTab === 'register' ? '注 册' : '重 置 密 码'}}
-      </button>
-      <view class="back-login" wx:if="{{currentTab === 'forgot'}}" bindtap="switchTab" data-tab="login">返回登录</view>
+    </view>
+    <view class="modal-cancel" bindtap="cancelAvatarModal">
+      <text>取消</text>
+    </view>
+  </view>
+</view>
+
+<view class="modal-overlay" wx:if="{{showNicknameModal}}" bindtap="cancelNicknameModal">
+  <view class="modal-content nickname-modal" catchtap="stopPropagation">
+    <view class="modal-title">设置昵称</view>
+    <view class="nickname-preview">
+      <view class="nickname-avatar" style="background-image: url({{userInfo.avatarUrl}})"></view>
+      <input class="nickname-input" placeholder="请输入昵称" value="{{userInfo.nickname}}" bindinput="onNicknameInput" maxlength="20" />
+    </view>
+    <view class="modal-actions">
+      <view class="modal-btn cancel" bindtap="cancelNicknameModal">取消</view>
+      <view class="modal-btn confirm" bindtap="confirmNickname">确认</view>
     </view>
   </view>
 </view>

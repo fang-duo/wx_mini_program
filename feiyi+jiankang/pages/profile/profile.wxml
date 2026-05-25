@@ -2,7 +2,7 @@
   <view class="user-info-box bg-primary">
     <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="chooseAvatar">
       <image class="avatar" src="{{userInfo.avatarUrl || ''}}" mode="aspectFill" wx:if="{{userInfo.avatarUrl}}"></image>
-      <view class="default-avatar" wx:else>我</view>
+      <image class="default-avatar" src="/images/人.png" mode="aspectFill" wx:else></image>
     </button>
     <view class="info-text">
       <input 
@@ -11,6 +11,7 @@
         placeholder="点击获取昵称"
         value="{{userInfo.nickname}}"
         bind:blur="onNicknameBlur"
+        bind:input="onNicknameInput"
       />
     </view>
   </view>
@@ -57,7 +58,5 @@
     </view>
   </view>
 
-  <view class="action-box">
-    <button class="btn-switch" bindtap="switchAccount">切换账号</button>
-  </view>
+
 </view>

@@ -1,11 +1,11 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/login/login",
     "pages/checkin/checkin",
     "pages/ai/ai",
     "pages/profile/profile",
     "pages/video-play/video-play",
-    "pages/login/login",
     "pages/category/category",
     "pages/detail/detail",
     "pages/account/account",

@@ -16,8 +16,9 @@ Page({
   async onShow() {
     const app = getApp();
     const localUserInfo = wx.getStorageSync(LOCAL_KEYS.USER_INFO);
+    console.log('个人中心读取本地用户信息:', localUserInfo);
     
-    if (localUserInfo && localUserInfo.nickname) {
+    if (localUserInfo) {
       this.setData({ userInfo: { ...localUserInfo } });
       app.globalData.userInfo = { ...localUserInfo };
     }
@@ -28,12 +29,27 @@ Page({
       const cloudUserInfo = await loadUserInfoFromCloud();
       if (!cloudUserInfo) return;
 
-      this.setData({ userInfo: { ...cloudUserInfo } });
-      app.globalData.userInfo = { ...cloudUserInfo };
-      wx.setStorageSync(LOCAL_KEYS.USER_INFO, { ...cloudUserInfo });
+      const mergedUserInfo = {
+        ...cloudUserInfo,
+        ...this.data.userInfo
+      };
+
+      this.setData({ userInfo: { ...mergedUserInfo } });
+      app.globalData.userInfo = { ...mergedUserInfo };
+      wx.setStorageSync(LOCAL_KEYS.USER_INFO, { ...mergedUserInfo });
     } catch (error) {
       console.error('加载云端用户信息失败：', error);
     }
+  },
+
+  onNicknameInput(e) {
+    const { value } = e.detail;
+    if (!value) return;
+
+    const newUserInfo = { ...this.data.userInfo, nickname: value };
+    this.setData({ userInfo: newUserInfo });
+    getApp().globalData.userInfo = { ...newUserInfo };
+    wx.setStorageSync(LOCAL_KEYS.USER_INFO, newUserInfo);
   },
 
   async onNicknameBlur(e) {
@@ -41,11 +57,6 @@ Page({
     if (!value) return;
 
     const newUserInfo = { ...this.data.userInfo, nickname: value };
-    this.setData({ userInfo: newUserInfo });
-    getApp().globalData.userInfo = { ...newUserInfo };
-    
-    wx.setStorageSync(LOCAL_KEYS.USER_INFO, newUserInfo);
-    
     await this.saveUserToCloud(newUserInfo);
   },
 
@@ -53,6 +64,7 @@ Page({
     if (!wx.cloud) return null;
 
     const db = wx.cloud.database();
+    const _ = db.command;
     try {
       const openid = await getCurrentOpenId();
       const updatePayload = {
@@ -76,7 +88,10 @@ Page({
         }
 
         const existed = openid
-          ? await db.collection('users').where({ openid }).limit(1).get()
+          ? await db.collection('users').where(_.or([
+              { _openid: openid },
+              { openid: openid }
+            ])).limit(1).get()
           : { data: [] };
 
         if (existed.data && existed.data.length) {

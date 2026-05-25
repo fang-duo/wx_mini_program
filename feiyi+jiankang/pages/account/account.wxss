@@ -67,12 +67,6 @@
   font-family: monospace;
 }
 
-.status-text {
-  font-size: 26rpx;
-  color: #7A8F79;
-  margin-left: 20rpx;
-}
-
 .btn-wrap {
   margin-top: 80rpx;
 }
