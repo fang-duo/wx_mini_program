@@ -12,7 +12,7 @@
   <swiper class="banner" indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#2E5A42">
     <swiper-item wx:for="{{banners}}" wx:key="id">
       <view class="banner-item bg-secondary">
-        <image class="banner-img" src="{{item.img}}" mode="aspectFill" />
+        <image class="banner-img" src="{{item.img}}" mode="aspectFill" wx:if="{{item.img}}" />
         <view class="banner-text">{{item.title}}</view>
       </view>
     </swiper-item>
@@ -46,7 +46,7 @@
     <view class="section-title">最新活动与宣传</view>
     <view class="article-list">
       <view class="article-item" wx:for="{{articles}}" wx:key="id" bindtap="goToDetail" data-title="{{item.title}}" data-item-id="{{item.id}}" data-content-type="{{item.contentType}}">
-        <image class="article-img" src="{{item.cover}}" mode="aspectFill"></image>
+        <image class="article-img" src="{{item.cover}}" mode="aspectFill" wx:if="{{item.cover}}"></image>
         <view class="article-info">
           <view class="article-title">{{item.title}}</view>
           <view class="article-desc">{{item.desc}}</view>

@@ -1,7 +1,7 @@
 <view class="container">
   <!-- 顶部封面 -->
   <view class="cover-box">
-    <image class="cover-img" src="{{article.cover || '/images/baduanjin.png'}}" mode="aspectFill"></image>
+    <image class="cover-img" src="{{article.cover}}" mode="aspectFill" wx:if="{{article.cover}}"></image>
     <view class="cover-mask"></view>
     <view class="title-wrap">
       <view class="title">{{article.title}}</view>

@@ -75,9 +75,9 @@ Page({
 
   async loadHomeContent() {
     const fallbackBanners = [
-      { id: 1, img: '/images/banner1.png', title: '探寻古老体育，传承民族健康' },
-      { id: 2, img: '/images/banner2.png', title: '药食同源：传统饮食中的养生之道' },
-      { id: 3, img: '/images/banner3.png', title: '非遗古乐与身心疗愈' }
+      { id: 1, img: '', title: '探寻古老体育，传承民族健康' },
+      { id: 2, img: '', title: '药食同源：传统饮食中的养生之道' },
+      { id: 3, img: '', title: '非遗古乐与身心疗愈' }
     ];
 
     const fallbackArticles = [
@@ -85,7 +85,7 @@ Page({
         id: 1,
         title: '二十四节气养生宣传周',
         desc: '围绕节气与非遗养生展开宣传活动，持续推出图文和视频内容。',
-        cover: '/images/baduanjin.png',
+        cover: '',
         tag: '活动宣传',
         date: '2026-05-07',
         contentType: 'campaign'

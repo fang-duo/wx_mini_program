@@ -43,7 +43,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'sports-baduanjin',
       title: '八段锦：柔和缓慢的养生功法',
-      cover: '/images/baduanjin.png',
+      cover: '',
       tag: '传统体育',
       date: '2023-10-15',
       intro: '八段锦作为国家级非物质文化遗产，其动作柔和连绵，滑利流畅，不仅能强身健体，还能调节内脏功能。',
@@ -58,7 +58,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'food-soup',
       title: '秋季养生：如何制作传统百合雪梨汤',
-      cover: '/images/soup.png',
+      cover: '',
       tag: '传统饮食',
       date: '2023-10-10',
       intro: '结合《本草纲目》的记载，百合与雪梨的搭配不仅是传统的美味，更是秋季润肺的佳品。',
@@ -73,7 +73,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'medicine-acupuncture',
       title: '中医针灸的神奇魅力',
-      cover: '/images/acupuncture.png',
+      cover: '',
       tag: '传统医药',
       date: '2023-10-05',
       intro: '被列入联合国教科文组织人类非物质文化遗产代表作名录的针灸，是古人智慧的结晶。',
@@ -88,7 +88,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'medicine-tuina',
       title: '中医推拿',
-      cover: '/images/tuina.png',
+      cover: '',
       tag: '传统医药',
       date: '2023-10-12',
       intro: '以人疗人，运用推、拿、提、捏、揉等手法，在人体经络穴位上进行治疗和保健。',
@@ -103,7 +103,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'sports-wuqinxi',
       title: '五禽戏：华佗创编的导引养生功法',
-      cover: '/images/wuqinxi.png',
+      cover: '',
       tag: '传统体育',
       date: '2023-10-18',
       intro: '模仿虎、鹿、熊、猿、鸟五种动物的形态和神态，达到强身健体的目的。',
@@ -118,7 +118,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'sports-taiji',
       title: '太极拳：内外兼修的拳术',
-      cover: '/images/taiji.png',
+      cover: '',
       tag: '传统体育',
       date: '2023-10-20',
       intro: '结合易经阴阳五行之变化，中医经络学说，是一种内外兼修、柔和、缓慢、轻灵的拳术。',
@@ -133,7 +133,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'food-tea',
       title: '非遗茶文化：修身养性的健康生活',
-      cover: '/images/tea.png',
+      cover: '',
       tag: '传统饮食',
       date: '2023-10-22',
       intro: '茶，发乎神农，闻于鲁周公。饮茶不仅是解渴，更是修身养性、清心雅志的健康生活方式。',
@@ -148,7 +148,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: 'music-guqin',
       title: '古琴疗愈：静心安神的传统音乐',
-      cover: '/images/guqin.png',
+      cover: '',
       tag: '传统音乐',
       date: '2023-10-25',
       intro: '古琴音色深沉、余音悠远，听之可平复情绪，适合现代人冥想放松与精神疗愈。',
@@ -163,7 +163,7 @@ function getFallbackArticleData(title) {
     data = {
       detailId: '',
       title,
-      cover: '/images/banner1.png',
+      cover: '',
       tag: '非遗文化',
       date: '2023-10-24',
       intro: '探索中华传统非遗文化，守护身心健康。',
@@ -182,7 +182,7 @@ function getFallbackArticleData(title) {
 function getFallbackCampaignData(title) {
   return {
     title,
-    cover: '/images/banner1.png',
+    cover: '',
     tag: '活动宣传',
     date: '2026-05-07',
     intro: '这里展示活动宣传的完整介绍内容。',

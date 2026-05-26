@@ -6,7 +6,7 @@
 
   <view class="list-container">
     <view class="card-item" wx:for="{{list}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}" data-title="{{item.title}}" data-content-type="{{item.contentType}}">
-      <image class="card-img" src="{{item.cover}}" mode="aspectFill"></image>
+      <image class="card-img" src="{{item.cover}}" mode="aspectFill" wx:if="{{item.cover}}"></image>
       <view class="card-content">
         <view class="card-title">{{item.title}}</view>
         <view class="card-desc">{{item.desc}}</view>
