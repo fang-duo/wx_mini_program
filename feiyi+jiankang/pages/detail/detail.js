@@ -7,7 +7,8 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary
+  getAccessSummary,
+  ensurePrivacyHomeLock
 } = require('../../utils/access');
 
 function normalizeMediaValue(value) {
@@ -216,10 +217,17 @@ Page({
   },
 
   onLoad(options) {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     const title = decodeURIComponent(options.title || '八段锦');
     const itemId = decodeURIComponent(options.itemId || '');
     const contentType = decodeURIComponent(options.contentType || 'heritage');
     this.loadArticleData({ title, itemId, contentType });
+  },
+
+  onShow() {
+    ensurePrivacyHomeLock(this, { allowAgreement: true });
   },
 
   async loadArticleData({ title, itemId, contentType }) {

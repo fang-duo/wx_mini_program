@@ -11,6 +11,10 @@ const {
   formatBytes
 } = require('../../utils/dataSync');
 
+const {
+  ensurePrivacyHomeLock
+} = require('../../utils/access');
+
 Page({
   data: {
     notify: DEFAULT_APP_PREFERENCES.notify,
@@ -19,6 +23,9 @@ Page({
   },
 
   async onShow() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     await this.loadPreferences();
     this.updateCacheSize();
   },

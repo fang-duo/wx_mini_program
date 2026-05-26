@@ -7,7 +7,8 @@ const {
 
 const {
   getAccessSummary,
-  setPrivacyState
+  setPrivacyState,
+  ensurePrivacyHomeLock
 } = require('../../utils/access');
 
 Page({
@@ -25,7 +26,14 @@ Page({
   },
 
   async onShow() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     await this.refreshPageState();
+  },
+
+  onTabItemTap() {
+    ensurePrivacyHomeLock(this, { allowAgreement: true, showToast: true });
   },
 
   async refreshPageState() {

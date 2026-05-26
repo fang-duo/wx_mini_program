@@ -2,6 +2,7 @@ const { LOCAL_KEYS } = require('./dataSync');
 
 const PRIVACY_STATE_KEY = 'privacy_state';
 const PRIVACY_VERSION = '2026-05-26';
+let lastPrivacyToastTime = 0;
 
 function getDefaultPrivacyState() {
   return {
@@ -128,6 +129,45 @@ function getAccessSummary() {
   };
 }
 
+function ensurePrivacyHomeLock(page, options = {}) {
+  const privacyState = getPrivacyState();
+  if (privacyState.hasResponded) {
+    return false;
+  }
+
+  const route = options.route || (page && page.route) || '';
+  const allowAgreement = !!options.allowAgreement;
+  const showToast = options.showToast !== false;
+
+  if (route === 'pages/index/index') {
+    return false;
+  }
+
+  if (allowAgreement && route === 'pages/agreement/agreement') {
+    return false;
+  }
+
+  if (showToast) {
+    const now = Date.now();
+    if (now - lastPrivacyToastTime > 1200) {
+      lastPrivacyToastTime = now;
+      wx.showToast({
+        title: '请先在首页选择是否同意隐私政策',
+        icon: 'none',
+        duration: 1800
+      });
+    }
+  }
+
+  setTimeout(() => {
+    wx.switchTab({
+      url: '/pages/index/index'
+    });
+  }, 0);
+
+  return true;
+}
+
 module.exports = {
   PRIVACY_STATE_KEY,
   PRIVACY_VERSION,
@@ -137,5 +177,6 @@ module.exports = {
   getCachedUserInfo,
   isLoggedIn,
   syncGlobalAccessState,
-  getAccessSummary
+  getAccessSummary,
+  ensurePrivacyHomeLock
 };

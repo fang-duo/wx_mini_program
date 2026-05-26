@@ -4,7 +4,8 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary
+  getAccessSummary,
+  ensurePrivacyHomeLock
 } = require('../../utils/access');
 
 Page({
@@ -16,6 +17,10 @@ Page({
   },
 
   async onShow() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
+
     const { privacyState, isLoggedIn } = getAccessSummary();
     if (privacyState.browseOnly || !privacyState.accepted) {
       this.setData({

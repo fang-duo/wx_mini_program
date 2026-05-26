@@ -9,7 +9,8 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary
+  getAccessSummary,
+  ensurePrivacyHomeLock
 } = require('../../utils/access');
 
 const EXIT_REMIND_DISABLED_KEY = 'ai_exit_remind_disabled';
@@ -57,6 +58,9 @@ Page({
   },
 
   onLoad() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     this.sessionStamp = Date.now();
     this.setData({
       remindDisabled: !!wx.getStorageSync(EXIT_REMIND_DISABLED_KEY)
@@ -66,8 +70,15 @@ Page({
   },
 
   onShow() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     this.refreshAccessState();
     this.updateLeaveReminder();
+  },
+
+  onTabItemTap() {
+    ensurePrivacyHomeLock(this, { allowAgreement: true, showToast: true });
   },
 
   onHide() {

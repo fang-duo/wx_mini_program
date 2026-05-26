@@ -7,7 +7,8 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary
+  getAccessSummary,
+  ensurePrivacyHomeLock
 } = require('../../utils/access');
 
 Page({
@@ -36,11 +37,21 @@ Page({
   },
 
   onLoad() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     this.refreshAccessState(true);
   },
 
   onShow() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
     this.refreshAccessState(false);
+  },
+
+  onTabItemTap() {
+    ensurePrivacyHomeLock(this, { allowAgreement: true, showToast: true });
   },
 
   async refreshAccessState(isFirstLoad) {

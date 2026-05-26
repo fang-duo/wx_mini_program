@@ -4,7 +4,8 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary
+  getAccessSummary,
+  ensurePrivacyHomeLock
 } = require('../../utils/access');
 
 const FAVORITES_COLLECTION = 'ai_favorites';
@@ -21,6 +22,10 @@ Page({
   },
 
   onShow() {
+    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
+      return;
+    }
+
     const { privacyState, isLoggedIn } = getAccessSummary();
     if (privacyState.browseOnly || !privacyState.accepted) {
       this.setData({
