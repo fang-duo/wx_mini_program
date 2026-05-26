@@ -1,5 +1,11 @@
 <view class="container">
-  <view class="list-container" wx:if="{{favorites.length > 0}}">
+  <view class="access-card" wx:if="{{accessDenied}}">
+    <view class="access-title">收藏内容暂不可用</view>
+    <view class="access-desc">{{deniedReason}}</view>
+    <button class="access-btn" bindtap="goToProfile">前往个人中心</button>
+  </view>
+
+  <view class="list-container" wx:elif="{{favorites.length > 0}}">
     <view class="card-item" wx:for="{{favorites}}" wx:key="favoriteKey" bindtap="goToDetail" data-title="{{item.title}}" data-item-id="{{item.id}}" data-content-type="{{item.contentType}}">
       <image class="card-img" src="{{item.cover}}" mode="aspectFill"></image>
       <view class="card-content">

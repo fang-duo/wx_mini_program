@@ -4,6 +4,44 @@
   padding-bottom: 140rpx;
 }
 
+.access-card {
+  margin: 30rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(46, 90, 66, 0.06);
+}
+
+.access-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #2E5A42;
+}
+
+.access-desc {
+  margin-top: 18rpx;
+  font-size: 27rpx;
+  line-height: 1.8;
+  color: #5d6d61;
+}
+
+.access-btn {
+  margin-top: 24rpx;
+  border-radius: 999rpx;
+  background: #F2F6F0;
+  color: #5d7260;
+  font-size: 30rpx;
+}
+
+.access-btn::after {
+  border: none;
+}
+
+.access-btn.primary {
+  background: #2E5A42;
+  color: #fff;
+}
+
 /* 顶部操作栏 */
 .header-actions {
   display: flex;

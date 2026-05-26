@@ -3,6 +3,10 @@ const {
   removeAiFavoritesByIds
 } = require('../../utils/dataSync');
 
+const {
+  getAccessSummary
+} = require('../../utils/access');
+
 const FAVORITES_COLLECTION = 'ai_favorites';
 
 Page({
@@ -11,10 +15,34 @@ Page({
     isBatchMode: false,
     isAllSelected: false,
     selectedCount: 0,
-    loading: false
+    loading: false,
+    accessDenied: false,
+    deniedReason: ''
   },
 
   onShow() {
+    const { privacyState, isLoggedIn } = getAccessSummary();
+    if (privacyState.browseOnly || !privacyState.accepted) {
+      this.setData({
+        accessDenied: true,
+        deniedReason: '当前处于仅浏览模式，AI 收藏暂不可用。'
+      });
+      return;
+    }
+
+    if (!isLoggedIn) {
+      this.setData({
+        accessDenied: true,
+        deniedReason: 'AI 收藏需要登录后才可查看和管理。'
+      });
+      return;
+    }
+
+    this.setData({
+      accessDenied: false,
+      deniedReason: ''
+    });
+
     this.loadMessages();
   },
 
@@ -173,6 +201,10 @@ Page({
 
   goToAI() {
     wx.switchTab({ url: '/pages/ai/ai' });
+  },
+
+  goToProfile() {
+    wx.switchTab({ url: '/pages/profile/profile' });
   },
 
   formatTime(value) {

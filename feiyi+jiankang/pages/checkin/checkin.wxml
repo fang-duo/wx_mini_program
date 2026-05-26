@@ -1,4 +1,12 @@
 <view class="container">
+  <view class="access-card" wx:if="{{accessDenied}}">
+    <view class="access-title">健康打卡暂不可用</view>
+    <view class="access-desc">{{deniedReason}}</view>
+    <button class="access-btn primary" bindtap="goToProfile">前往个人中心</button>
+    <button class="access-btn" bindtap="goToHome">返回首页</button>
+  </view>
+
+  <block wx:else>
   <!-- 日历部分 -->
   <view class="calendar-card">
     <view class="calendar-header">
@@ -91,4 +99,5 @@
       </view>
     </view>
   </view>
+  </block>
 </view>

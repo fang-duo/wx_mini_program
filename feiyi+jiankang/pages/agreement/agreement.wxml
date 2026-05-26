@@ -1,0 +1,12 @@
+<view class="container agreement-page">
+  <view class="agreement-card">
+    <view class="agreement-title">{{title}}</view>
+    <view class="agreement-update">{{updateTime}}</view>
+    <view class="agreement-intro">{{intro}}</view>
+
+    <view class="section-item" wx:for="{{sections}}" wx:key="heading">
+      <view class="section-heading">{{item.heading}}</view>
+      <view class="section-body">{{item.body}}</view>
+    </view>
+  </view>
+</view>

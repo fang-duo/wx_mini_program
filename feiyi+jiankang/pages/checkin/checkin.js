@@ -6,6 +6,10 @@ const {
   saveCheckinRecordToCloud
 } = require('../../utils/dataSync');
 
+const {
+  getAccessSummary
+} = require('../../utils/access');
+
 Page({
   data: {
     currentYear: new Date().getFullYear(),
@@ -26,25 +30,51 @@ Page({
     },
     allProjects: [],
     selectedDateRecord: null,
-    historyRecords: {} 
+    historyRecords: {},
+    accessDenied: false,
+    deniedReason: ''
   },
 
   onLoad() {
-    const now = new Date();
-    const today = this.formatDate(now);
-    
-    this.setData({
-      today,
-      selectedDate: today
-    });
-
-    this.initProjects();
-    this.loadData();
-    this.generateCalendar();
+    this.refreshAccessState(true);
   },
 
   onShow() {
-    this.loadData();
+    this.refreshAccessState(false);
+  },
+
+  async refreshAccessState(isFirstLoad) {
+    const { privacyState, isLoggedIn } = getAccessSummary();
+    let deniedReason = '';
+
+    if (privacyState.browseOnly || !privacyState.accepted) {
+      deniedReason = '当前处于仅浏览模式，请先同意隐私政策后再使用健康打卡。';
+    } else if (!isLoggedIn) {
+      deniedReason = '健康打卡需要登录后才可记录和同步，游客暂不可使用。';
+    }
+
+    this.setData({
+      accessDenied: !!deniedReason,
+      deniedReason
+    });
+
+    if (deniedReason) {
+      return;
+    }
+
+    if (isFirstLoad || !this.data.today) {
+      const now = new Date();
+      const today = this.formatDate(now);
+
+      this.setData({
+        today,
+        selectedDate: today
+      });
+
+      this.initProjects();
+    }
+
+    await this.loadData();
     this.generateCalendar();
   },
 
@@ -339,6 +369,18 @@ Page({
     if (!date) return;
     this.setData({ selectedDate: date }, () => {
       this.loadRecordForDate(date);
+    });
+  },
+
+  goToProfile() {
+    wx.switchTab({
+      url: '/pages/profile/profile'
+    });
+  },
+
+  goToHome() {
+    wx.switchTab({
+      url: '/pages/index/index'
     });
   }
 })

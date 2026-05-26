@@ -7,6 +7,18 @@
   </view>
 
   <view class="settings-group">
+    <view class="settings-item" bindtap="openAgreement" data-type="privacy">
+      <text class="label">隐私政策</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="settings-item" bindtap="openAgreement" data-type="user">
+      <text class="label">用户协议</text>
+      <text class="arrow">></text>
+    </view>
+    <view class="settings-item" bindtap="openAgreement" data-type="ai">
+      <text class="label">AI使用说明</text>
+      <text class="arrow">></text>
+    </view>
     <view class="settings-item" bindtap="clearCache">
       <text class="label">清除缓存</text>
       <view class="right-info">

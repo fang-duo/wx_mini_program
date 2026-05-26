@@ -1,3 +1,5 @@
+const { syncGlobalAccessState } = require('./utils/access');
+
 App({
   onLaunch: function() {
     if (!wx.cloud) {
@@ -14,7 +16,7 @@ App({
     wx.setStorageSync('logs', logs)
     
     const localUserInfo = wx.getStorageSync('local_user_info')
-    if (localUserInfo && localUserInfo.nickname && localUserInfo.nickname !== '点击获取昵称' && localUserInfo.nickname !== '体验用户') {
+    if (localUserInfo && localUserInfo.nickname) {
       this.globalData.userInfo = { ...localUserInfo }
     }
 
@@ -25,6 +27,8 @@ App({
         ...appPreferences
       }
     }
+
+    syncGlobalAccessState()
   },
 
   globalData: {
@@ -33,7 +37,9 @@ App({
       nickname: '', 
       avatarUrl: ''
     },
-    isLoggedIn: true,
+    isLoggedIn: false,
+    privacyAccepted: false,
+    isBrowseOnly: false,
     appPreferences: {
       notify: true
     }

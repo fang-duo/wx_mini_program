@@ -4,6 +4,38 @@
   padding: 30rpx;
 }
 
+.access-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(46, 90, 66, 0.06);
+}
+
+.access-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #2E5A42;
+}
+
+.access-desc {
+  margin-top: 18rpx;
+  font-size: 27rpx;
+  line-height: 1.8;
+  color: #5d6d61;
+}
+
+.access-btn {
+  margin-top: 28rpx;
+  border-radius: 999rpx;
+  background: #2E5A42;
+  color: #fff;
+  font-size: 30rpx;
+}
+
+.access-btn::after {
+  border: none;
+}
+
 .form-group {
   background-color: #fff;
   border-radius: 20rpx;

@@ -121,6 +121,13 @@ Page({
     });
   },
 
+  openAgreement(e) {
+    const type = e.currentTarget.dataset.type || 'privacy';
+    wx.navigateTo({
+      url: `/pages/agreement/agreement?type=${type}`
+    });
+  },
+
   logout() {
     wx.showModal({
       title: '退出登录',
@@ -130,8 +137,11 @@ Page({
           clearUserSessionCache();
           getApp().globalData.isLoggedIn = false;
           getApp().globalData.openid = '';
-          getApp().globalData.userInfo = null;
-          wx.reLaunch({ url: '/pages/login/login' });
+          getApp().globalData.userInfo = {
+            nickname: '',
+            avatarUrl: ''
+          };
+          wx.switchTab({ url: '/pages/profile/profile' });
         }
       }
     });

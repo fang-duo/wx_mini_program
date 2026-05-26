@@ -3,13 +3,41 @@ const {
   fetchContentFavoritesFromCloud
 } = require('../../utils/dataSync');
 
+const {
+  getAccessSummary
+} = require('../../utils/access');
+
 Page({
   data: {
     favorites: [],
-    loading: false
+    loading: false,
+    accessDenied: false,
+    deniedReason: ''
   },
 
   async onShow() {
+    const { privacyState, isLoggedIn } = getAccessSummary();
+    if (privacyState.browseOnly || !privacyState.accepted) {
+      this.setData({
+        accessDenied: true,
+        deniedReason: '当前处于仅浏览模式，首页收藏功能暂不可用。'
+      });
+      return;
+    }
+
+    if (!isLoggedIn) {
+      this.setData({
+        accessDenied: true,
+        deniedReason: '首页收藏需要登录后查看和同步。'
+      });
+      return;
+    }
+
+    this.setData({
+      accessDenied: false,
+      deniedReason: ''
+    });
+
     const cachedFavorites = getContentFavoritesCache();
     this.setData({ favorites: cachedFavorites });
 
@@ -47,6 +75,12 @@ Page({
 
     wx.navigateTo({
       url: `/pages/detail/detail?${query.join('&')}`
+    });
+  },
+
+  goToProfile() {
+    wx.switchTab({
+      url: '/pages/profile/profile'
     });
   }
 })

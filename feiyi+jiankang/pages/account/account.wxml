@@ -1,4 +1,11 @@
 <view class="container">
+  <view class="access-card" wx:if="{{accessDenied}}">
+    <view class="access-title">账号信息暂不可用</view>
+    <view class="access-desc">账号信息管理仅对已登录用户开放，请先前往个人中心登录。</view>
+    <button class="access-btn" bindtap="goToProfile">前往个人中心</button>
+  </view>
+
+  <block wx:else>
   <view class="form-group">
     <view class="form-item">
       <text class="label">头像</text>
@@ -17,4 +24,5 @@
   <view class="btn-wrap">
     <button class="btn-save" bindtap="saveInfo">保存修改</button>
   </view>
+  </block>
 </view>

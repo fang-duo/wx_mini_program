@@ -1,9 +1,21 @@
+const {
+  getAccessSummary
+} = require('../../utils/access');
+
 Page({
   data: {
-    userInfo: {}
+    userInfo: {},
+    accessDenied: false
   },
 
   onShow() {
+    const { privacyState, isLoggedIn } = getAccessSummary();
+    if (privacyState.browseOnly || !privacyState.accepted || !isLoggedIn) {
+      this.setData({ accessDenied: true });
+      return;
+    }
+
+    this.setData({ accessDenied: false });
     const app = getApp();
     if (app.globalData.userInfo) {
       this.setData({ userInfo: app.globalData.userInfo });
@@ -41,5 +53,11 @@ Page({
     setTimeout(() => {
       wx.navigateBack();
     }, 1500);
+  },
+
+  goToProfile() {
+    wx.switchTab({
+      url: '/pages/profile/profile'
+    });
   }
 })

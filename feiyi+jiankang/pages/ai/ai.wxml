@@ -1,10 +1,28 @@
 <view class="container">
-  <view class="session-tip" wx:if="{{!remindDisabled}}">
-    <text class="session-tip-text">离开页面后，未收藏的 AI 问答会清空，请及时收藏重要内容。</text>
-    <text class="session-tip-action" bindtap="disableExitReminder">以后不再提醒</text>
+  <view class="browse-gate" wx:if="{{isBrowseOnly}}">
+    <view class="browse-gate-title">AI 问答暂不可用</view>
+    <view class="browse-gate-desc">你当前处于仅浏览模式。若需使用 AI 问答、健康打卡、登录和收藏等完整功能，请先回到首页同意隐私政策。</view>
+    <button class="browse-gate-btn" bindtap="goToHome">返回首页</button>
   </view>
 
-  <view class="header-actions" wx:if="{{qaPairs.length > 0}}">
+  <block wx:else>
+  <view class="session-tip" wx:if="{{!remindDisabled && !sessionTipDeferred}}">
+    <text class="session-tip-text">离开页面后，未收藏的 AI 问答会清空，请及时收藏重要内容。</text>
+    <view class="session-tip-actions">
+      <text class="session-tip-action session-tip-secondary" bindtap="deferExitReminder">稍后提醒</text>
+      <text class="session-tip-action" bindtap="disableExitReminder">以后不再提醒</text>
+    </view>
+  </view>
+
+  <view class="guest-ai-tip" wx:if="{{!isLoggedIn}}">
+    <text class="guest-ai-tip-text">当前为游客体验：可临时使用 AI 问答，登录后可收藏问答并在个人中心统一查看。</text>
+  </view>
+
+  <view class="medical-disclaimer">
+    <text class="medical-disclaimer-text">AI 回答问题仅供参考，不替代专业医疗建议。</text>
+  </view>
+
+  <view class="header-actions" wx:if="{{qaPairs.length > 0 && isLoggedIn}}">
     <view class="select-all" wx:if="{{isBatchMode}}" bindtap="toggleSelectAll">
       <icon type="{{isAllSelected ? 'success' : 'circle'}}" size="20" color="{{isAllSelected ? '#2E5A42' : '#999'}}"></icon>
       <text>全选</text>
@@ -84,4 +102,5 @@
     />
     <button bindtap="onSend" class="send-btn">发送</button>
   </view>
+  </block>
 </view>

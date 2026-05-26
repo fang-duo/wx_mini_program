@@ -5,25 +5,60 @@ const {
   getCurrentOpenId
 } = require('../../utils/dataSync');
 
+const {
+  getAccessSummary,
+  setPrivacyState
+} = require('../../utils/access');
+
 Page({
   data: {
     userInfo: {
       nickname: '',
       avatarUrl: ''
-    }
+    },
+    isLoggedIn: false,
+    isBrowseOnly: false,
+    showLoginSheet: false,
+    loginLoading: false,
+    agreedUserAgreement: false,
+    agreedAiStatement: false
   },
 
   async onShow() {
+    await this.refreshPageState();
+  },
+
+  async refreshPageState() {
+    const { privacyState, isLoggedIn } = getAccessSummary();
     const app = getApp();
     const localUserInfo = wx.getStorageSync(LOCAL_KEYS.USER_INFO);
-    console.log('个人中心读取本地用户信息:', localUserInfo);
-    
-    if (localUserInfo) {
+    const canUseAccountFeatures = privacyState.accepted && !privacyState.browseOnly;
+
+    this.setData({
+      isBrowseOnly: privacyState.browseOnly,
+      isLoggedIn: canUseAccountFeatures && isLoggedIn,
+      showLoginSheet: false,
+      loginLoading: false,
+      agreedUserAgreement: false,
+      agreedAiStatement: false
+    });
+
+    if (!canUseAccountFeatures) {
+      this.setData({
+        userInfo: {
+          nickname: '',
+          avatarUrl: ''
+        }
+      });
+      return;
+    }
+
+    if (localUserInfo && isLoggedIn) {
       this.setData({ userInfo: { ...localUserInfo } });
       app.globalData.userInfo = { ...localUserInfo };
     }
 
-    if (!wx.cloud) return;
+    if (!isLoggedIn || !wx.cloud) return;
 
     try {
       const cloudUserInfo = await loadUserInfoFromCloud();
@@ -40,6 +75,156 @@ Page({
     } catch (error) {
       console.error('加载云端用户信息失败：', error);
     }
+  },
+
+  openAgreement(e) {
+    const type = e.currentTarget.dataset.type || 'privacy';
+    wx.navigateTo({
+      url: `/pages/agreement/agreement?type=${type}`
+    });
+  },
+
+  openLoginSheet() {
+    this.setData({ showLoginSheet: true });
+  },
+
+  closeLoginSheet() {
+    this.setData({
+      showLoginSheet: false,
+      agreedUserAgreement: false,
+      agreedAiStatement: false
+    });
+  },
+
+  continueGuestMode() {
+    this.closeLoginSheet();
+    wx.showToast({
+      title: '当前为游客模式',
+      icon: 'none'
+    });
+  },
+
+  toggleAgreement(e) {
+    const field = e.currentTarget.dataset.field;
+    if (!field) return;
+
+    this.setData({
+      [field]: !this.data[field]
+    });
+  },
+
+  async submitLogin() {
+    if (this.data.loginLoading) return;
+
+    if (!this.data.agreedUserAgreement || !this.data.agreedAiStatement) {
+      wx.showToast({
+        title: '请先勾选协议后再登录',
+        icon: 'none'
+      });
+      return;
+    }
+
+    this.setData({ loginLoading: true });
+    wx.showLoading({ title: '登录中...' });
+
+    if (!wx.cloud) {
+      wx.hideLoading();
+      this.setData({ loginLoading: false });
+      wx.showToast({
+        title: '当前环境未开启云能力',
+        icon: 'none'
+      });
+      return;
+    }
+
+    try {
+      const loginRes = await wx.cloud.callFunction({
+        name: 'login'
+      });
+      const result = loginRes && loginRes.result ? loginRes.result : {};
+
+      if (!result.success || !result.openid) {
+        throw new Error(result.error || '未获取到有效登录态');
+      }
+
+      const app = getApp();
+      const cachedUserInfo = wx.getStorageSync(LOCAL_KEYS.USER_INFO) || {};
+      const cloudUserInfo = result.userInfo || {};
+      const userInfo = {
+        _id: cloudUserInfo._id || cachedUserInfo._id || '',
+        openid: result.openid,
+        nickname: cloudUserInfo.nickname || cachedUserInfo.nickname || '微信用户',
+        avatarUrl: cloudUserInfo.avatarUrl || cachedUserInfo.avatarUrl || '',
+        loggedIn: true
+      };
+
+      app.globalData.openid = result.openid;
+      app.globalData.isLoggedIn = true;
+      app.globalData.userInfo = { ...userInfo };
+      wx.setStorageSync(LOCAL_KEYS.USER_INFO, { ...userInfo });
+
+      const saveResult = await this.saveUserToCloud(userInfo);
+      if (saveResult && saveResult._id) {
+        userInfo._id = saveResult._id;
+        app.globalData.userInfo = { ...userInfo };
+        wx.setStorageSync(LOCAL_KEYS.USER_INFO, { ...userInfo });
+      }
+
+      await this.refreshPageState();
+
+      wx.showToast({
+        title: '登录成功',
+        icon: 'success'
+      });
+    } catch (error) {
+      console.error('真实登录失败：', error);
+      wx.showToast({
+        title: '登录失败，请检查云函数',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
+      this.setData({
+        loginLoading: false,
+        showLoginSheet: false,
+        agreedUserAgreement: false,
+        agreedAiStatement: false
+      });
+    }
+  },
+
+  showLoginRequiredDialog(featureName) {
+    wx.showModal({
+      title: '登录后可用',
+      content: `${featureName}需要登录后才可使用，是否现在去登录？`,
+      confirmText: '去登录',
+      success: res => {
+        if (!res.confirm) return;
+        this.openLoginSheet();
+      }
+    });
+  },
+
+  enableFullFeatures() {
+    wx.showModal({
+      title: '开启完整功能',
+      content: '确认已阅读《隐私政策》，并同意开启登录、AI、打卡和收藏等完整功能吗？',
+      success: res => {
+        if (!res.confirm) return;
+
+        setPrivacyState({
+          hasResponded: true,
+          accepted: true,
+          browseOnly: false
+        });
+
+        this.refreshPageState();
+        wx.showToast({
+          title: '已开启完整功能',
+          icon: 'success'
+        });
+      }
+    });
   },
 
   onNicknameInput(e) {
@@ -169,7 +354,20 @@ Page({
 
   handleMenuClick(e) {
     const title = e.currentTarget.dataset.title;
-    
+
+    if (this.data.isBrowseOnly) {
+      wx.showToast({
+        title: '仅浏览模式下暂不开放此功能',
+        icon: 'none'
+      });
+      return;
+    }
+
+    if (!this.data.isLoggedIn && ['账号信息管理', '我的收藏内容', 'AI问答收藏'].includes(title)) {
+      this.showLoginRequiredDialog(title);
+      return;
+    }
+
     if (title === '账号信息管理') {
       wx.navigateTo({ url: '/pages/account/account' });
     } else if (title === '我的收藏内容') {
@@ -192,13 +390,16 @@ Page({
     wx.showModal({
       title: '切换账号',
       content: '确定要切换当前账号吗？',
-      success(res) {
+      success: res => {
         if (res.confirm) {
           clearUserSessionCache();
           getApp().globalData.isLoggedIn = false;
           getApp().globalData.openid = '';
-          getApp().globalData.userInfo = null;
-          wx.redirectTo({ url: '/pages/login/login' });
+          getApp().globalData.userInfo = {
+            nickname: '',
+            avatarUrl: ''
+          };
+          this.refreshPageState();
         }
       }
     });
@@ -208,15 +409,25 @@ Page({
     wx.showModal({
       title: '退出登录',
       content: '确定要退出当前账号吗？',
-      success(res) {
+      success: res => {
         if (res.confirm) {
           clearUserSessionCache();
           getApp().globalData.isLoggedIn = false;
           getApp().globalData.openid = '';
-          getApp().globalData.userInfo = null;
-          wx.redirectTo({ url: '/pages/login/login' });
+          getApp().globalData.userInfo = {
+            nickname: '',
+            avatarUrl: ''
+          };
+          this.refreshPageState();
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success'
+          });
         }
       }
     });
+  },
+
+  stopPropagation() {
   }
 })

@@ -5,6 +5,59 @@
   background-color: #f7f9fb;
 }
 
+.browse-gate {
+  margin: 40rpx 30rpx 0;
+  background: #ffffff;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(46, 90, 66, 0.06);
+}
+
+.browse-gate-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #2a5d4d;
+}
+
+.browse-gate-desc {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #5d6c63;
+}
+
+.browse-gate-btn {
+  margin-top: 32rpx;
+  border-radius: 999rpx;
+  background: #2a5d4d;
+  color: #ffffff;
+  font-size: 30rpx;
+}
+
+.guest-ai-tip {
+  padding: 18rpx 24rpx;
+  background: #fffdf2;
+  border-bottom: 1rpx solid #f1e6b6;
+}
+
+.guest-ai-tip-text {
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #7c6a23;
+}
+
+.medical-disclaimer {
+  padding: 18rpx 24rpx;
+  background: #fff7f0;
+  border-bottom: 1rpx solid #f4dcc7;
+}
+
+.medical-disclaimer-text {
+  font-size: 24rpx;
+  line-height: 1.6;
+  color: #9a5a2b;
+}
+
 .session-tip {
   display: flex;
   justify-content: space-between;
@@ -27,6 +80,17 @@
   color: #2a5d4d;
   font-size: 24rpx;
   font-weight: 600;
+}
+
+.session-tip-actions {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.session-tip-secondary {
+  margin-right: 24rpx;
+  color: #6b8275;
 }
 
 .header-actions {

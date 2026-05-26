@@ -10,59 +10,80 @@ Page({
   },
 
   handleLogin() {
-    console.log('handleLogin 被调用');
     if (this.data.loading) return;
 
     this.setData({ loading: true });
 
-    wx.getUserProfile({
-      desc: '用于完善会员资料',
-      success: (userProfileRes) => {
-        console.log('wx.getUserProfile 成功:', userProfileRes);
-        const userProfile = userProfileRes.userInfo;
-        
-        const isAnonymous = !userProfile.avatarUrl || 
-                           userProfile.nickName === '微信用户';
-        
-        if (isAnonymous) {
-          console.log('获取到的是匿名数据，用户可能未授权或授权已过期');
-          this.setData({
-            userInfo: {
-              avatarUrl: '',
-              nickname: ''
-            },
-            showAvatarModal: true,
-            loading: false
+    this.realLogin();
+  },
+
+  async realLogin() {
+    if (!wx.cloud) {
+      this.setData({ loading: false });
+      wx.showToast({ title: '当前环境未开启云能力', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '进入中...' });
+
+    try {
+      const loginRes = await wx.cloud.callFunction({
+        name: 'login'
+      });
+      const result = loginRes && loginRes.result ? loginRes.result : {};
+
+      if (!result.success || !result.openid) {
+        throw new Error(result.error || '未获取到有效登录态');
+      }
+
+      const cloudUserInfo = result.userInfo || {};
+      const userInfo = {
+        _id: cloudUserInfo._id || '',
+        openid: result.openid,
+        avatarUrl: cloudUserInfo.avatarUrl || '',
+        nickname: cloudUserInfo.nickname || '微信用户',
+        loggedIn: true
+      };
+      const app = getApp();
+
+      app.globalData.openid = result.openid;
+      app.globalData.isLoggedIn = true;
+      app.globalData.userInfo = { ...userInfo };
+      wx.setStorageSync('local_user_info', { ...userInfo });
+
+      if (!cloudUserInfo || !cloudUserInfo._id) {
+        try {
+          const db = wx.cloud.database();
+          const addRes = await db.collection('users').add({
+            data: {
+              openid: result.openid,
+              nickname: userInfo.nickname,
+              avatarUrl: userInfo.avatarUrl,
+              createTime: db.serverDate(),
+              updateTime: db.serverDate()
+            }
           });
-          return;
-        }
-        
-        this.setData({
-          userInfo: {
-            avatarUrl: userProfile.avatarUrl,
-            nickname: userProfile.nickName
-          },
-          showAvatarModal: true,
-          loading: false
-        });
-      },
-      fail: (err) => {
-        console.error('wx.getUserProfile 失败:', err);
-        this.setData({ loading: false });
-        
-        if (err.errMsg && err.errMsg.includes('cancel')) {
-          wx.showToast({ title: '已取消授权', icon: 'none' });
-        } else {
-          this.setData({
-            userInfo: {
-              avatarUrl: '',
-              nickname: ''
-            },
-            showAvatarModal: true
-          });
+          userInfo._id = addRes._id;
+          app.globalData.userInfo = { ...userInfo };
+          wx.setStorageSync('local_user_info', { ...userInfo });
+        } catch (dbErr) {
+          console.error('创建用户记录失败:', dbErr);
         }
       }
-    });
+
+      wx.hideLoading();
+      wx.showToast({ title: '进入成功', icon: 'success' });
+
+      setTimeout(() => {
+        wx.switchTab({ url: '/pages/index/index' });
+      }, 1200);
+    } catch (error) {
+      wx.hideLoading();
+      console.error('真实登录失败:', error);
+      wx.showToast({ title: '登录失败，请检查云函数', icon: 'none' });
+    } finally {
+      this.setData({ loading: false });
+    }
   },
 
   selectWechatAvatar() {

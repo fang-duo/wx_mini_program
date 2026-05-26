@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/login/login",
+    "pages/agreement/agreement",
     "pages/checkin/checkin",
     "pages/ai/ai",
     "pages/profile/profile",

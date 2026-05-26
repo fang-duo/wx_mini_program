@@ -6,6 +6,10 @@ const {
   removeContentFavoriteFromCloud
 } = require('../../utils/dataSync');
 
+const {
+  getAccessSummary
+} = require('../../utils/access');
+
 function normalizeMediaValue(value) {
   if (!value) return '';
   if (typeof value === 'string') return value;
@@ -307,6 +311,30 @@ Page({
   },
 
   async toggleStar() {
+    const { privacyState, isLoggedIn } = getAccessSummary();
+    if (privacyState.browseOnly || !privacyState.accepted) {
+      wx.showToast({
+        title: '仅完整功能模式下可收藏',
+        icon: 'none'
+      });
+      return;
+    }
+
+    if (!isLoggedIn) {
+      wx.showModal({
+        title: '登录后可收藏',
+        content: '内容收藏需要登录后使用，是否前往个人中心登录？',
+        confirmText: '去登录',
+        success: res => {
+          if (!res.confirm) return;
+          wx.switchTab({
+            url: '/pages/profile/profile'
+          });
+        }
+      });
+      return;
+    }
+
     const isStarred = !this.data.isStarred;
     const currentItem = {
       ...this.data.article,

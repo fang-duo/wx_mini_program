@@ -8,6 +8,10 @@ const {
   saveAiFavoritesToCloud
 } = require('../../utils/dataSync');
 
+const {
+  getAccessSummary
+} = require('../../utils/access');
+
 const EXIT_REMIND_DISABLED_KEY = 'ai_exit_remind_disabled';
 const FAVORITES_COLLECTION = 'ai_favorites';
 
@@ -46,7 +50,10 @@ Page({
     isBatchMode: false,
     isAllSelected: false,
     selectedCount: 0,
-    remindDisabled: false
+    remindDisabled: false,
+    sessionTipDeferred: false,
+    isBrowseOnly: false,
+    isLoggedIn: false
   },
 
   onLoad() {
@@ -54,10 +61,12 @@ Page({
     this.setData({
       remindDisabled: !!wx.getStorageSync(EXIT_REMIND_DISABLED_KEY)
     });
+    this.refreshAccessState();
     this.updateLeaveReminder();
   },
 
   onShow() {
+    this.refreshAccessState();
     this.updateLeaveReminder();
   },
 
@@ -80,6 +89,14 @@ Page({
   },
 
   onSend() {
+    if (this.data.isBrowseOnly) {
+      wx.showToast({
+        title: '仅浏览模式下不可使用 AI 问答',
+        icon: 'none'
+      });
+      return;
+    }
+
     const text = this.data.inputValue.trim();
     if (!text) return;
 
@@ -192,6 +209,11 @@ Page({
   },
 
   toggleBatchMode() {
+    if (!this.data.isLoggedIn) {
+      this.promptLogin('收藏 AI 问答');
+      return;
+    }
+
     const selectablePairs = this.getSelectablePairs();
     if (!selectablePairs.length) {
       wx.showToast({
@@ -266,6 +288,11 @@ Page({
   },
 
   async saveSelectedFavorites() {
+    if (!this.data.isLoggedIn) {
+      this.promptLogin('收藏 AI 问答');
+      return;
+    }
+
     const selectedPairs = this.data.qaPairs.filter(item => item.selected && this.isSelectablePair(item));
     if (!selectedPairs.length) {
       wx.showToast({
@@ -335,6 +362,11 @@ Page({
   },
 
   goToFavorites() {
+    if (!this.data.isLoggedIn) {
+      this.promptLogin('查看 AI 收藏');
+      return;
+    }
+
     wx.navigateTo({
       url: '/pages/message/message'
     });
@@ -362,6 +394,16 @@ Page({
     });
   },
 
+  deferExitReminder() {
+    this.setData({
+      sessionTipDeferred: true
+    });
+    wx.showToast({
+      title: '本次稍后提醒',
+      icon: 'none'
+    });
+  },
+
   resetSession() {
     this.sessionStamp = Date.now();
 
@@ -376,11 +418,19 @@ Page({
       scrollToMessage: '',
       isBatchMode: false,
       isAllSelected: false,
-      selectedCount: 0
+      selectedCount: 0,
+      sessionTipDeferred: false
     });
   },
 
   updateLeaveReminder() {
+    if (this.data.isBrowseOnly) {
+      if (wx.disableAlertBeforeUnload) {
+        wx.disableAlertBeforeUnload();
+      }
+      return;
+    }
+
     const hasUnfavoritedPairs = this.data.qaPairs.some(item => item.answer && !item.isFavorite);
 
     if (!hasUnfavoritedPairs || this.data.remindDisabled) {
@@ -423,5 +473,39 @@ Page({
     const hour = `${date.getHours()}`.padStart(2, '0');
     const minute = `${date.getMinutes()}`.padStart(2, '0');
     return `${year}-${month}-${day} ${hour}:${minute}`;
+  },
+
+  refreshAccessState() {
+    const { privacyState, isLoggedIn } = getAccessSummary();
+    const isBrowseOnly = privacyState.browseOnly || !privacyState.accepted;
+
+    this.setData({
+      isBrowseOnly,
+      isLoggedIn: !isBrowseOnly && isLoggedIn
+    });
+
+    if (isBrowseOnly) {
+      this.resetSession();
+    }
+  },
+
+  promptLogin(featureName) {
+    wx.showModal({
+      title: '登录后可用',
+      content: `${featureName}需要登录后使用。当前游客可继续体验临时 AI 问答，是否前往个人中心登录？`,
+      confirmText: '去登录',
+      success: res => {
+        if (!res.confirm) return;
+        wx.switchTab({
+          url: '/pages/profile/profile'
+        });
+      }
+    });
+  },
+
+  goToHome() {
+    wx.switchTab({
+      url: '/pages/index/index'
+    });
   }
 });

@@ -1,62 +1,132 @@
 <view class="container profile-container">
-  <view class="user-info-box bg-primary">
-    <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="chooseAvatar">
-      <image class="avatar" src="{{userInfo.avatarUrl || ''}}" mode="aspectFill" wx:if="{{userInfo.avatarUrl}}"></image>
-      <image class="default-avatar" src="/images/人.png" mode="aspectFill" wx:else></image>
-    </button>
-    <view class="info-text">
-      <input 
-        class="nickname-input" 
-        type="nickname"
-        placeholder="点击获取昵称"
-        value="{{userInfo.nickname}}"
-        bind:blur="onNicknameBlur"
-        bind:input="onNicknameInput"
-      />
+  <block wx:if="{{isBrowseOnly}}">
+    <view class="guest-hero bg-primary">
+      <view class="guest-avatar">游</view>
+      <view class="guest-title">当前为仅浏览模式</view>
+      <view class="guest-subtitle">你已选择不同意隐私政策，当前仅可浏览首页、分类和详情内容。</view>
     </view>
+
+    <view class="guest-card">
+      <view class="guest-card-title">当前可用内容</view>
+      <view class="guest-line">首页内容浏览</view>
+      <view class="guest-line">分类与详情查看</view>
+      <view class="guest-line">隐私政策、用户协议与 AI 使用说明查看</view>
+      <button class="primary-btn" bindtap="enableFullFeatures">同意隐私并开启完整功能</button>
+      <button class="secondary-btn" bindtap="openAgreement" data-type="privacy">查看隐私政策</button>
+    </view>
+  </block>
+
+  <block wx:elif="{{!isLoggedIn}}">
+    <view class="guest-hero bg-primary">
+      <view class="guest-avatar">未</view>
+      <view class="guest-title">欢迎使用非遗健康小程序</view>
+    </view>
+
+    <view class="guest-card">
+      <button class="primary-btn" bindtap="openLoginSheet">微信授权登录</button>
+      <button class="secondary-btn" bindtap="continueGuestMode">暂不登录</button>
+    </view>
+
+    <view class="menu-list">
+      <view class="menu-item" bindtap="handleMenuClick" data-title="帮助与反馈">
+        <view class="menu-left">
+          <text class="menu-text">帮助与反馈</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+
+      <view class="menu-item" bindtap="handleMenuClick" data-title="设置">
+        <view class="menu-left">
+          <text class="menu-text">设置</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="user-info-box bg-primary">
+      <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="chooseAvatar">
+        <image class="avatar" src="{{userInfo.avatarUrl || ''}}" mode="aspectFill" wx:if="{{userInfo.avatarUrl}}"></image>
+        <image class="default-avatar" src="/images/人.png" mode="aspectFill" wx:else></image>
+      </button>
+      <view class="info-text">
+        <input 
+          class="nickname-input" 
+          type="nickname"
+          placeholder="点击获取昵称"
+          value="{{userInfo.nickname}}"
+          bind:blur="onNicknameBlur"
+          bind:input="onNicknameInput"
+        />
+      </view>
+    </view>
+
+    <view class="menu-list">
+      <view class="menu-item" bindtap="handleMenuClick" data-title="账号信息管理">
+        <view class="menu-left">
+          <text class="menu-text">账号信息管理</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="handleMenuClick" data-title="我的收藏内容">
+        <view class="menu-left">
+          <text class="menu-text">首页收藏</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+
+      <view class="menu-item" bindtap="handleMenuClick" data-title="AI问答收藏">
+        <view class="menu-left">
+          <text class="menu-text">AI问答收藏</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+      
+      <view class="menu-item" bindtap="handleMenuClick" data-title="帮助与反馈">
+        <view class="menu-left">
+          <text class="menu-text">帮助与反馈</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+
+      <view class="menu-item" bindtap="handleMenuClick" data-title="设置">
+        <view class="menu-left">
+          <text class="menu-text">设置</text>
+        </view>
+        <text class="arrow">></text>
+      </view>
+    </view>
+
+    <view class="action-box">
+      <button class="btn-logout btn-logout-green" bindtap="logout">退出当前登录</button>
+    </view>
+  </block>
+</view>
+
+<view class="sheet-mask" wx:if="{{showLoginSheet}}" bindtap="closeLoginSheet">
+  <view class="login-sheet" catchtap="stopPropagation">
+    <view class="sheet-title">欢迎使用非遗健康小程序</view>
+    <view class="sheet-subtitle">登录后可同步你的收藏、健康打卡和个人资料。</view>
+
+    <view class="agreement-item">
+      <view class="agreement-check" bindtap="toggleAgreement" data-field="agreedUserAgreement">
+        <icon type="{{agreedUserAgreement ? 'success' : 'circle'}}" size="18" color="{{agreedUserAgreement ? '#2E5A42' : '#B5B5B5'}}"></icon>
+        <text class="agreement-prefix">我已阅读并同意</text>
+      </view>
+      <text class="agreement-link" catchtap="openAgreement" data-type="user">《用户协议》</text>
+    </view>
+
+    <view class="agreement-item">
+      <view class="agreement-check" bindtap="toggleAgreement" data-field="agreedAiStatement">
+        <icon type="{{agreedAiStatement ? 'success' : 'circle'}}" size="18" color="{{agreedAiStatement ? '#2E5A42' : '#B5B5B5'}}"></icon>
+        <text class="agreement-prefix">我已阅读并同意</text>
+      </view>
+      <text class="agreement-link" catchtap="openAgreement" data-type="ai">《AI使用说明》</text>
+    </view>
+
+    <button class="sheet-primary-btn" bindtap="submitLogin" loading="{{loginLoading}}" disabled="{{loginLoading || !(agreedUserAgreement && agreedAiStatement)}}">微信授权登录</button>
+    <button class="sheet-secondary-btn" bindtap="continueGuestMode" disabled="{{loginLoading}}">暂不登录</button>
   </view>
-
-  <view class="menu-list">
-    <view class="menu-item" bindtap="handleMenuClick" data-title="账号信息管理">
-      <view class="menu-left">
-        <text class="menu-icon">👤</text>
-        <text class="menu-text">账号信息管理</text>
-      </view>
-      <text class="arrow">></text>
-    </view>
-    
-    <view class="menu-item" bindtap="handleMenuClick" data-title="我的收藏内容">
-      <view class="menu-left">
-        <text class="menu-icon">⭐</text>
-        <text class="menu-text">首页收藏</text>
-      </view>
-      <text class="arrow">></text>
-    </view>
-
-    <view class="menu-item" bindtap="handleMenuClick" data-title="AI问答收藏">
-      <view class="menu-left">
-        <text class="menu-icon">✉</text>
-        <text class="menu-text">AI问答收藏</text>
-      </view>
-      <text class="arrow">></text>
-    </view>
-    
-    <view class="menu-item" bindtap="handleMenuClick" data-title="帮助与反馈">
-      <view class="menu-left">
-        <text class="menu-icon">❓</text>
-        <text class="menu-text">帮助与反馈</text>
-      </view>
-      <text class="arrow">></text>
-    </view>
-
-    <view class="menu-item" bindtap="handleMenuClick" data-title="设置">
-      <view class="menu-left">
-        <text class="menu-icon">⚙</text>
-        <text class="menu-text">设置</text>
-      </view>
-      <text class="arrow">></text>
-    </view>
-  </view>
-
-
 </view>

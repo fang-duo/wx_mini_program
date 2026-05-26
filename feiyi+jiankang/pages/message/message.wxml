@@ -1,4 +1,12 @@
 <view class="container">
+  <view class="access-card" wx:if="{{accessDenied}}">
+    <view class="access-title">AI 收藏暂不可用</view>
+    <view class="access-desc">{{deniedReason}}</view>
+    <button class="access-btn primary" bindtap="goToProfile">前往个人中心</button>
+    <button class="access-btn" bindtap="goToAI">返回 AI 页面</button>
+  </view>
+
+  <block wx:else>
   <view class="header-actions" wx:if="{{messages.length > 0}}">
     <view class="select-all" wx:if="{{isBatchMode}}" bindtap="toggleSelectAll">
       <icon type="{{isAllSelected ? 'success' : 'circle'}}" size="20" color="{{isAllSelected ? '#2E5A42' : '#999'}}"></icon>
@@ -46,4 +54,5 @@
     <view class="batch-info">已选 {{selectedCount}} 项</view>
     <button class="btn-delete-batch" bindtap="deleteSelected">批量删除</button>
   </view>
+  </block>
 </view>
