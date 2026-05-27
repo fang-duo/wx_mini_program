@@ -221,20 +221,14 @@ Page({
   },
 
   openPrivacy() {
-    wx.showModal({
-      title: '隐私政策',
-      content: '本应用重视用户隐私保护。我们承诺不会收集、使用或分享您的个人信息，除非经过您的明确授权。详细的隐私政策内容请查看我们的官方文档。',
-      showCancel: false,
-      confirmText: '我知道了'
+    wx.navigateTo({
+      url: '/pages/agreement/agreement?type=privacy'
     });
   },
 
   openAgreement() {
-    wx.showModal({
-      title: '用户协议',
-      content: '欢迎使用遗韵养生应用。使用本应用即表示您同意遵守我们的用户协议。协议内容包括：用户权利与义务、服务条款、免责声明等。详细内容请查看我们的官方文档。',
-      showCancel: false,
-      confirmText: '我知道了'
+    wx.navigateTo({
+      url: '/pages/agreement/agreement?type=user'
     });
   }
 })
