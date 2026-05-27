@@ -186,6 +186,15 @@
   border-radius: 10rpx;
 }
 
+.projects-state {
+  background: #f7faf6;
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: #5e6d62;
+}
+
 .project-item-container {
   display: flex;
   justify-content: space-between;

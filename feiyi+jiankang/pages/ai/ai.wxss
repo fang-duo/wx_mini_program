@@ -168,6 +168,20 @@
   box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.03);
 }
 
+.starter-tip {
+  margin: 20rpx 40rpx 0;
+  padding: 24rpx 28rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0,0,0,0.03);
+}
+
+.starter-tip-text {
+  font-size: 26rpx;
+  line-height: 1.7;
+  color: #5d6c63;
+}
+
 /* 聊天气泡 */
 .msg-box { display: flex; align-items: flex-start; padding: 20rpx; margin-bottom: 10rpx; }
 .msg-box.selected .content {

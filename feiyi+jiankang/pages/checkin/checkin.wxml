@@ -51,31 +51,39 @@
   <!-- 打卡记录 -->
   <view class="card record-card">
     <view class="card-title">日期打卡 ({{selectedDate}})</view>
-    <view class="form-item">
-      <text>当前体重 (kg)</text>
-      <input type="digit" value="{{record.weight}}" bindinput="inputWeight" placeholder="请输入体重" />
+    <view class="projects-state" wx:if="{{loadingProjects}}">
+      打卡项目加载中，请稍候。
     </view>
-    <view class="form-item">
-      <text>非遗项目 (点击选择并填写时长/重量)</text>
-      <checkbox-group bindchange="checkboxChange">
-        <view class="project-list">
-          <view class="project-item-container" wx:for="{{allProjects}}" wx:key="id">
-            <label class="project-item">
-              <checkbox value="{{item.id}}" checked="{{item.checked}}" />
-              <view class="project-info">
-                <text class="project-name">{{item.title}}</text>
-                <text class="project-rate">{{item.value}} {{item.unit}}</text>
+    <view class="projects-state" wx:elif="{{projectsEmpty}}">
+      当前暂无可用于打卡的正式项目，请先在云端发布分类内容后再使用健康打卡。
+    </view>
+    <block wx:else>
+      <view class="form-item">
+        <text>当前体重 (kg)</text>
+        <input type="digit" value="{{record.weight}}" bindinput="inputWeight" placeholder="请输入体重" />
+      </view>
+      <view class="form-item">
+        <text>非遗项目 (点击选择并填写时长/重量)</text>
+        <checkbox-group bindchange="checkboxChange">
+          <view class="project-list">
+            <view class="project-item-container" wx:for="{{allProjects}}" wx:key="id">
+              <label class="project-item">
+                <checkbox value="{{item.id}}" checked="{{item.checked}}" />
+                <view class="project-info">
+                  <text class="project-name">{{item.title}}</text>
+                  <text class="project-rate">{{item.value}} {{item.unit}}</text>
+                </view>
+              </label>
+              <view class="duration-input-wrap" wx:if="{{item.checked}}">
+                <input type="number" value="{{record.durations[item.id]}}" placeholder="{{item.inputUnit === '克' ? '重量' : '时长'}}" bindinput="inputDuration" data-id="{{item.id}}" />
+                <text>{{item.inputUnit}}</text>
               </view>
-            </label>
-            <view class="duration-input-wrap" wx:if="{{item.checked}}">
-              <input type="number" value="{{record.durations[item.id]}}" placeholder="{{item.inputUnit === '克' ? '重量' : '时长'}}" bindinput="inputDuration" data-id="{{item.id}}" />
-              <text>{{item.inputUnit}}</text>
             </view>
           </view>
-        </view>
-      </checkbox-group>
-    </view>
-    <button class="btn-submit" bindtap="submitRecord">{{selectedDateRecord ? '修改打卡记录' : '提交打卡记录'}}</button>
+        </checkbox-group>
+      </view>
+      <button class="btn-submit" bindtap="submitRecord">{{selectedDateRecord ? '修改打卡记录' : '提交打卡记录'}}</button>
+    </block>
   </view>
 
   <!-- 今日成果 -->

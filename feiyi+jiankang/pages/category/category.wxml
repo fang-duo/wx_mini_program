@@ -19,6 +19,6 @@
   </view>
 
   <view class="empty-state" wx:if="{{list.length === 0}}">
-    <text>更多内容正在整理中，敬请期待...</text>
+    <text>当前分类暂无正式内容，请先在云端发布后再查看。</text>
   </view>
 </view>

@@ -39,9 +39,9 @@
       <text class="ai-welcome-text">您好，我是非遗健康AI助手。请问有什么我可以帮您的？</text>
     </view>
 
-    <view class="recommend-section" wx:if="{{messages.length <= 1}}">
+    <view class="recommend-section" wx:if="{{messages.length <= 1 && recommends.length > 0}}">
       <view class="recommend-title">
-        <text class="title-icon">猜您想问：</text>
+        <text class="title-icon">猜你想问：</text>
       </view>
       <view class="recommend-cards">
         <view 
@@ -54,6 +54,10 @@
           {{item}}
         </view>
       </view>
+    </view>
+
+    <view class="starter-tip" wx:if="{{messages.length <= 1 && recommends.length === 0}}">
+      <text class="starter-tip-text">请输入你想咨询的正式问题，系统将基于当前已开通能力返回参考回答。</text>
     </view>
 
     <view class="message-container" wx:if="{{messages.length > 1}}">

@@ -56,7 +56,7 @@ const FIXED_CATEGORIES = [
 Page({
   data: {
     banners: [],
-    categories: [],
+    categories: FIXED_CATEGORIES,
     articles: [],
     dailyRecommend: null,
     loadingHomeContent: true,
@@ -74,36 +74,12 @@ Page({
   },
 
   async loadHomeContent() {
-    const fallbackBanners = [
-      { id: 1, img: '', title: '探寻古老体育，传承民族健康' },
-      { id: 2, img: '', title: '药食同源：传统饮食中的养生之道' },
-      { id: 3, img: '', title: '非遗古乐与身心疗愈' }
-    ];
-
-    const fallbackArticles = [
-      {
-        id: 1,
-        title: '二十四节气养生宣传周',
-        desc: '围绕节气与非遗养生展开宣传活动，持续推出图文和视频内容。',
-        cover: '',
-        tag: '活动宣传',
-        date: '2026-05-07',
-        contentType: 'campaign'
-      }
-    ];
-
-    const fallbackDailyRecommend = {
-      id: 'fallback-baduanjin',
-      title: '八段锦',
-      summary: '八段锦作为国家级非物质文化遗产，动作柔和连绵，适合作为日常养生练习。',
-      contentType: 'heritage'
-    };
-
     this.setData({
-      banners: fallbackBanners,
+      banners: [],
       categories: FIXED_CATEGORIES,
-      articles: fallbackArticles,
-      dailyRecommend: fallbackDailyRecommend
+      articles: [],
+      dailyRecommend: null,
+      loadingHomeContent: true
     });
 
     if (!wx.cloud) {
@@ -187,12 +163,12 @@ Page({
       const dailyRecommend =
         dailyRecommendCandidates[0] ||
         homeRecommendCandidates[0] ||
-        fallbackDailyRecommend;
+        null;
 
       this.setData({
-        banners: banners.length ? banners : fallbackBanners,
+        banners,
         categories: FIXED_CATEGORIES,
-        articles: campaignItems.length ? campaignItems : fallbackArticles,
+        articles: campaignItems,
         dailyRecommend,
         loadingHomeContent: false
       });

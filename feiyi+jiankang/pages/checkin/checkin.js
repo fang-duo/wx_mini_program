@@ -11,6 +11,28 @@ const {
   ensurePrivacyHomeLock
 } = require('../../utils/access');
 
+const CHECKIN_CATEGORY_RULES = {
+  sports: { categoryName: '传统体育', value: 3.5, unit: 'kcal/min', inputUnit: '分钟' },
+  food: { categoryName: '传统饮食', value: 0.005, unit: '健康/g', inputUnit: '克' },
+  medicine: { categoryName: '传统医药', value: 0.1, unit: '健康/min', inputUnit: '分钟' },
+  music: { categoryName: '传统音乐', value: 0.1, unit: '修养/min', inputUnit: '分钟' }
+};
+
+async function queryFirstAvailableCollection(db, collectionNames, executor) {
+  let lastError = null;
+
+  for (const name of collectionNames) {
+    try {
+      return await executor(db.collection(name), name);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  if (lastError) throw lastError;
+  return null;
+}
+
 Page({
   data: {
     currentYear: new Date().getFullYear(),
@@ -30,6 +52,8 @@ Page({
       durations: {}
     },
     allProjects: [],
+    loadingProjects: true,
+    projectsEmpty: false,
     selectedDateRecord: null,
     historyRecords: {},
     accessDenied: false,
@@ -81,10 +105,9 @@ Page({
         today,
         selectedDate: today
       });
-
-      this.initProjects();
     }
 
+    await this.loadProjects();
     await this.loadData();
     this.generateCalendar();
   },
@@ -96,18 +119,67 @@ Page({
     return `${year}-${month}-${day}`;
   },
 
-  initProjects() {
-    const projects = [
-      { id: 's1', title: '八段锦', category: 'sports', categoryName: '传统体育', value: 3.5, unit: 'kcal/min', inputUnit: '分钟' },
-      { id: 's2', title: '五禽戏', category: 'sports', categoryName: '传统体育', value: 3.5, unit: 'kcal/min', inputUnit: '分钟' },
-      { id: 's3', title: '太极拳', category: 'sports', categoryName: '传统体育', value: 4.5, unit: 'kcal/min', inputUnit: '分钟' },
-      { id: 'f1', title: '百合雪梨汤', category: 'food', categoryName: '传统饮食', value: 0.005, unit: '健康/g', inputUnit: '克' },
-      { id: 'f2', title: '非遗茶文化', category: 'food', categoryName: '传统饮食', value: 0.01, unit: '健康/g', inputUnit: '克' },
-      { id: 'm1', title: '中医针灸', category: 'medicine', categoryName: '传统医药', value: 0.1, unit: '健康/min', inputUnit: '分钟' },
-      { id: 'm2', title: '中医推拿', category: 'medicine', categoryName: '传统医药', value: 0.1, unit: '健康/min', inputUnit: '分钟' },
-      { id: 'mu1', title: '古琴疗愈', category: 'music', categoryName: '传统音乐', value: 0.1, unit: '修养/min', inputUnit: '分钟' }
-    ];
-    this.setData({ allProjects: projects });
+  async loadProjects() {
+    this.setData({
+      loadingProjects: true,
+      projectsEmpty: false,
+      allProjects: []
+    });
+
+    if (!wx.cloud) {
+      this.setData({
+        loadingProjects: false,
+        projectsEmpty: true
+      });
+      return;
+    }
+
+    const db = wx.cloud.database();
+
+    try {
+      const heritageRes = await queryFirstAvailableCollection(db, ['heritage_contents', 'heritage_content'], collection =>
+        collection.get()
+      );
+
+      const projects = (heritageRes.data || [])
+        .filter(item => {
+          const category = item.category || item.categoryId || '';
+          const rule = CHECKIN_CATEGORY_RULES[category];
+          const itemStatus = typeof item.status === 'boolean' ? item.status : true;
+          return !!(rule && itemStatus && item.title);
+        })
+        .sort((a, b) => {
+          const aSort = typeof a.sort === 'number' ? a.sort : 999;
+          const bSort = typeof b.sort === 'number' ? b.sort : 999;
+          return aSort - bSort;
+        })
+        .map(item => {
+          const category = item.category || item.categoryId || '';
+          const rule = CHECKIN_CATEGORY_RULES[category];
+          return {
+            id: item._id || item.id,
+            title: item.title || '',
+            category,
+            categoryName: rule.categoryName,
+            value: rule.value,
+            unit: rule.unit,
+            inputUnit: rule.inputUnit
+          };
+        });
+
+      this.setData({
+        allProjects: projects,
+        loadingProjects: false,
+        projectsEmpty: projects.length === 0
+      });
+    } catch (error) {
+      console.error('加载打卡项目失败：', error);
+      this.setData({
+        allProjects: [],
+        loadingProjects: false,
+        projectsEmpty: true
+      });
+    }
   },
 
   async loadData() {
@@ -311,9 +383,19 @@ Page({
 
   async submitRecord() {
     const { record, allProjects, historyRecords, selectedDate } = this.data;
-    
+
+    if (!allProjects.length) {
+      wx.showToast({ title: '暂无可打卡项目', icon: 'none' });
+      return;
+    }
+
     if (!record.weight) {
       wx.showToast({ title: '请输入体重', icon: 'none' });
+      return;
+    }
+
+    if (!record.projects.length) {
+      wx.showToast({ title: '请至少选择一个项目', icon: 'none' });
       return;
     }
 

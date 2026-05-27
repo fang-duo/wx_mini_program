@@ -9,7 +9,7 @@
   </view>
 
   <!-- 顶部 Banner/轮播图 -->
-  <swiper class="banner" indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#2E5A42">
+  <swiper class="banner" wx:if="{{banners.length > 0}}" indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#2E5A42">
     <swiper-item wx:for="{{banners}}" wx:key="id">
       <view class="banner-item bg-secondary">
         <image class="banner-img" src="{{item.img}}" mode="aspectFill" wx:if="{{item.img}}" />
@@ -17,6 +17,10 @@
       </view>
     </swiper-item>
   </swiper>
+  <view class="empty-panel" wx:elif="{{!loadingHomeContent}}">
+    <view class="empty-panel-title">首页轮播暂未发布</view>
+    <view class="empty-panel-desc">当前首页展示内容以云端配置为准，发布后将在这里显示。</view>
+  </view>
 
   <!-- 四大分类模块 -->
   <view class="section">
@@ -34,17 +38,18 @@
   <!-- 每日推荐 (可选加分) -->
   <view class="section recommend-daily">
     <view class="section-title">每日推荐</view>
-    <view class="daily-card">
+    <view class="daily-card" wx:if="{{dailyRecommend}}">
       <view class="daily-title">{{dailyRecommend.title || '今日养生建议'}}</view>
       <view class="daily-desc">{{dailyRecommend.summary || '今日推荐内容整理中，稍后将在这里展示。'}}</view>
       <view class="daily-btn" bindtap="goToDetail" data-title="{{dailyRecommend.title}}" data-item-id="{{dailyRecommend.id}}" data-content-type="{{dailyRecommend.contentType}}">去练习 ></view>
     </view>
+    <view class="section-empty" wx:else>当前暂无每日推荐内容，请先在云端发布正式推荐。</view>
   </view>
 
   <!-- 最新活动与宣传 -->
   <view class="section">
     <view class="section-title">最新活动与宣传</view>
-    <view class="article-list">
+    <view class="article-list" wx:if="{{articles.length > 0}}">
       <view class="article-item" wx:for="{{articles}}" wx:key="id" bindtap="goToDetail" data-title="{{item.title}}" data-item-id="{{item.id}}" data-content-type="{{item.contentType}}">
         <image class="article-img" src="{{item.cover}}" mode="aspectFill" wx:if="{{item.cover}}"></image>
         <view class="article-info">
@@ -57,6 +62,7 @@
         </view>
       </view>
     </view>
+    <view class="section-empty" wx:else>当前暂无活动与宣传内容，请先在云端完成发布。</view>
   </view>
 
   <view class="privacy-mask" wx:if="{{showPrivacyDialog}}">
