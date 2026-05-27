@@ -1,6 +1,6 @@
 <view class="container">
   <view class="access-card" wx:if="{{accessDenied}}">
-    <view class="access-title">收藏内容暂不可用</view>
+    <view class="access-title">收藏内容使用说明</view>
     <view class="access-desc">{{deniedReason}}</view>
     <button class="access-btn" bindtap="goToProfile">前往个人中心</button>
   </view>

@@ -107,7 +107,7 @@ Page({
   continueGuestMode() {
     this.closeLoginSheet();
     wx.showToast({
-      title: '当前为游客模式',
+      title: '当前可继续浏览内容',
       icon: 'none'
     });
   },
@@ -139,7 +139,7 @@ Page({
       wx.hideLoading();
       this.setData({ loginLoading: false });
       wx.showToast({
-        title: '当前环境未开启云能力',
+        title: '当前服务暂时不可用，请稍后再试',
         icon: 'none'
       });
       return;
@@ -187,7 +187,7 @@ Page({
     } catch (error) {
       console.error('真实登录失败：', error);
       wx.showToast({
-        title: '登录失败，请检查云函数',
+        title: '登录失败，请稍后重试',
         icon: 'none'
       });
     } finally {
@@ -365,7 +365,7 @@ Page({
 
     if (this.data.isBrowseOnly) {
       wx.showToast({
-        title: '仅浏览模式下暂不开放此功能',
+        title: '同意隐私政策后可使用该功能',
         icon: 'none'
       });
       return;
@@ -388,7 +388,7 @@ Page({
       wx.navigateTo({ url: '/pages/settings/settings' });
     } else {
       wx.showToast({
-        title: title + ' 功能开发中',
+        title: title + ' 功能正在完善中',
         icon: 'none'
       });
     }

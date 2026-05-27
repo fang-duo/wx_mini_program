@@ -30,7 +30,7 @@ Page({
     if (privacyState.browseOnly || !privacyState.accepted) {
       this.setData({
         accessDenied: true,
-        deniedReason: '当前处于仅浏览模式，AI 收藏暂不可用。'
+        deniedReason: '同意隐私政策后可查看和管理 AI 收藏。'
       });
       return;
     }
@@ -38,7 +38,7 @@ Page({
     if (!isLoggedIn) {
       this.setData({
         accessDenied: true,
-        deniedReason: 'AI 收藏需要登录后才可查看和管理。'
+        deniedReason: '登录后可查看和管理 AI 收藏。'
       });
       return;
     }
@@ -54,7 +54,7 @@ Page({
   async loadMessages() {
     if (!wx.cloud) {
       wx.showToast({
-        title: '当前环境未开启云能力',
+        title: '当前服务暂时不可用，请稍后再试',
         icon: 'none'
       });
       return;
@@ -79,7 +79,7 @@ Page({
     } catch (error) {
       console.error('加载 AI 收藏失败：', error);
       wx.showToast({
-        title: '请先创建 ai_favorites 集合',
+        title: '数据加载失败，请稍后重试',
         icon: 'none'
       });
     } finally {

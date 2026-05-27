@@ -102,7 +102,7 @@ Page({
   onSend() {
     if (this.data.isBrowseOnly) {
       wx.showToast({
-        title: '仅浏览模式下不可使用 AI 问答',
+        title: '同意隐私政策后可使用 AI 问答',
         icon: 'none'
       });
       return;
@@ -315,7 +315,7 @@ Page({
 
     if (!wx.cloud) {
       wx.showToast({
-        title: '当前环境未开启云能力',
+        title: '当前服务暂时不可用，请稍后再试',
         icon: 'none'
       });
       return;
@@ -364,7 +364,7 @@ Page({
     } catch (error) {
       console.error('保存 AI 收藏失败：', error);
       wx.showToast({
-        title: '收藏失败，请先确认 ai_favorites 集合已创建',
+        title: '收藏失败，请稍后再试',
         icon: 'none'
       });
     } finally {
@@ -503,7 +503,7 @@ Page({
   promptLogin(featureName) {
     wx.showModal({
       title: '登录后可用',
-      content: `${featureName}需要登录后使用。当前游客可继续体验临时 AI 问答，是否前往个人中心登录？`,
+      content: `${featureName}需要登录后使用。当前可继续使用基础 AI 问答，是否前往个人中心登录？`,
       confirmText: '去登录',
       success: res => {
         if (!res.confirm) return;

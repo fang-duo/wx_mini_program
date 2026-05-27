@@ -25,7 +25,7 @@ Page({
     if (privacyState.browseOnly || !privacyState.accepted) {
       this.setData({
         accessDenied: true,
-        deniedReason: '当前处于仅浏览模式，首页收藏功能暂不可用。'
+        deniedReason: '同意隐私政策后可查看和同步首页收藏。'
       });
       return;
     }
@@ -33,7 +33,7 @@ Page({
     if (!isLoggedIn) {
       this.setData({
         accessDenied: true,
-        deniedReason: '首页收藏需要登录后查看和同步。'
+        deniedReason: '登录后可查看和同步首页收藏。'
       });
       return;
     }
@@ -56,7 +56,7 @@ Page({
       console.error('加载首页收藏失败：', error);
       if (!cachedFavorites.length) {
         wx.showToast({
-          title: '云端收藏加载失败',
+          title: '收藏内容加载失败，请稍后重试',
           icon: 'none'
         });
       }

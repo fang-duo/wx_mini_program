@@ -265,7 +265,7 @@ Page({
 
   startPractice() {
     wx.showToast({
-      title: '打卡功能开发中',
+      title: '当前内容暂不支持打卡',
       icon: 'none'
     });
   },

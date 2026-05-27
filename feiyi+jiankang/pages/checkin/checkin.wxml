@@ -1,6 +1,6 @@
 <view class="container">
   <view class="access-card" wx:if="{{accessDenied}}">
-    <view class="access-title">健康打卡暂不可用</view>
+    <view class="access-title">健康打卡使用说明</view>
     <view class="access-desc">{{deniedReason}}</view>
     <button class="access-btn primary" bindtap="goToProfile">前往个人中心</button>
     <button class="access-btn" bindtap="goToHome">返回首页</button>
@@ -55,7 +55,7 @@
       打卡项目加载中，请稍候。
     </view>
     <view class="projects-state" wx:elif="{{projectsEmpty}}">
-      当前暂无可用于打卡的正式项目，请先在云端发布分类内容后再使用健康打卡。
+      当前暂无可打卡项目。
     </view>
     <block wx:else>
       <view class="form-item">

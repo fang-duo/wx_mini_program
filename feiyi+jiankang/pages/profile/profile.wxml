@@ -2,8 +2,8 @@
   <block wx:if="{{isBrowseOnly}}">
     <view class="guest-hero bg-primary">
       <view class="guest-avatar">游</view>
-      <view class="guest-title">当前为仅浏览模式</view>
-      <view class="guest-subtitle">你已选择不同意隐私政策，当前仅可浏览首页、分类和详情内容。</view>
+      <view class="guest-title">当前为基础浏览模式</view>
+      <view class="guest-subtitle">当前可浏览首页、分类和详情内容。</view>
     </view>
 
     <view class="guest-card">

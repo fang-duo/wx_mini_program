@@ -83,9 +83,9 @@ Page({
     let deniedReason = '';
 
     if (privacyState.browseOnly || !privacyState.accepted) {
-      deniedReason = '当前处于仅浏览模式，请先同意隐私政策后再使用健康打卡。';
+      deniedReason = '同意隐私政策后可使用健康打卡。';
     } else if (!isLoggedIn) {
-      deniedReason = '健康打卡需要登录后才可记录和同步，游客暂不可使用。';
+      deniedReason = '登录后可记录和同步健康打卡。';
     }
 
     this.setData({

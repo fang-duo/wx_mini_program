@@ -1,7 +1,7 @@
 <view class="container">
   <view class="browse-banner" wx:if="{{isBrowseOnly}}">
-    <view class="browse-banner-title">当前为仅浏览模式</view>
-    <view class="browse-banner-desc">你仍可浏览首页、分类和详情内容；同意隐私政策后可开启 AI、打卡、登录和收藏等完整功能。</view>
+    <view class="browse-banner-title">当前为基础浏览模式</view>
+    <view class="browse-banner-desc">你仍可浏览首页、分类和详情内容；同意隐私政策后可使用 AI、打卡、登录和收藏等功能。</view>
     <view class="browse-banner-actions">
       <text class="banner-link" bindtap="openAgreement">查看隐私政策</text>
       <text class="banner-link primary" bindtap="enableFullFeatures">同意并开启完整功能</text>
@@ -18,8 +18,8 @@
     </swiper-item>
   </swiper>
   <view class="empty-panel" wx:elif="{{!loadingHomeContent}}">
-    <view class="empty-panel-title">首页轮播暂未发布</view>
-    <view class="empty-panel-desc">当前首页展示内容以云端配置为准，发布后将在这里显示。</view>
+    <view class="empty-panel-title">当前暂无精选内容</view>
+    <view class="empty-panel-desc">精选内容将根据活动安排持续更新，请稍后查看。</view>
   </view>
 
   <!-- 四大分类模块 -->
@@ -40,10 +40,10 @@
     <view class="section-title">每日推荐</view>
     <view class="daily-card" wx:if="{{dailyRecommend}}">
       <view class="daily-title">{{dailyRecommend.title || '今日养生建议'}}</view>
-      <view class="daily-desc">{{dailyRecommend.summary || '今日推荐内容整理中，稍后将在这里展示。'}}</view>
+      <view class="daily-desc">{{dailyRecommend.summary || '当前推荐内容请以页面展示信息为准。'}}</view>
       <view class="daily-btn" bindtap="goToDetail" data-title="{{dailyRecommend.title}}" data-item-id="{{dailyRecommend.id}}" data-content-type="{{dailyRecommend.contentType}}">去练习 ></view>
     </view>
-    <view class="section-empty" wx:else>当前暂无每日推荐内容，请先在云端发布正式推荐。</view>
+    <view class="section-empty" wx:else>当前暂无每日推荐内容。</view>
   </view>
 
   <!-- 最新活动与宣传 -->
@@ -62,7 +62,7 @@
         </view>
       </view>
     </view>
-    <view class="section-empty" wx:else>当前暂无活动与宣传内容，请先在云端完成发布。</view>
+    <view class="section-empty" wx:else>当前暂无活动内容。</view>
   </view>
 
   <view class="privacy-mask" wx:if="{{showPrivacyDialog}}">

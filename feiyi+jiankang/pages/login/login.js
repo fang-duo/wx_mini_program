@@ -20,7 +20,7 @@ Page({
   async realLogin() {
     if (!wx.cloud) {
       this.setData({ loading: false });
-      wx.showToast({ title: '当前环境未开启云能力', icon: 'none' });
+      wx.showToast({ title: '当前服务暂时不可用，请稍后再试', icon: 'none' });
       return;
     }
 
@@ -80,7 +80,7 @@ Page({
     } catch (error) {
       wx.hideLoading();
       console.error('真实登录失败:', error);
-      wx.showToast({ title: '登录失败，请检查云函数', icon: 'none' });
+      wx.showToast({ title: '登录失败，请稍后重试', icon: 'none' });
     } finally {
       this.setData({ loading: false });
     }

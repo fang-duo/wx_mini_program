@@ -1,7 +1,7 @@
 <view class="container">
   <view class="browse-gate" wx:if="{{isBrowseOnly}}">
-    <view class="browse-gate-title">AI 问答暂不可用</view>
-    <view class="browse-gate-desc">你当前处于仅浏览模式。若需使用 AI 问答、健康打卡、登录和收藏等完整功能，请先回到首页同意隐私政策。</view>
+    <view class="browse-gate-title">AI 问答使用说明</view>
+    <view class="browse-gate-desc">同意隐私政策后可使用 AI 问答、健康打卡、登录和收藏等功能。</view>
     <button class="browse-gate-btn" bindtap="goToHome">返回首页</button>
   </view>
 
@@ -15,7 +15,7 @@
   </view>
 
   <view class="guest-ai-tip" wx:if="{{!isLoggedIn}}">
-    <text class="guest-ai-tip-text">当前为游客体验：可临时使用 AI 问答，登录后可收藏问答并在个人中心统一查看。</text>
+    <text class="guest-ai-tip-text">当前可使用基础 AI 问答，登录后可收藏问答并在个人中心统一查看。</text>
   </view>
 
   <view class="medical-disclaimer">
@@ -57,7 +57,7 @@
     </view>
 
     <view class="starter-tip" wx:if="{{messages.length <= 1 && recommends.length === 0}}">
-      <text class="starter-tip-text">请输入你想咨询的正式问题，系统将基于当前已开通能力返回参考回答。</text>
+      <text class="starter-tip-text">请输入你想咨询的问题，系统将返回参考回答。</text>
     </view>
 
     <view class="message-container" wx:if="{{messages.length > 1}}">

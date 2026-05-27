@@ -242,7 +242,7 @@ Page({
     });
 
     wx.showToast({
-      title: '当前为仅浏览模式',
+      title: '当前为基础浏览模式',
       icon: 'none'
     });
   },

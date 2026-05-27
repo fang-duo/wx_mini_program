@@ -30,19 +30,19 @@ async function queryFirstAvailableCollection(db, collectionNames, executor) {
 const CATEGORY_META_MAP = {
   sports: {
     title: '传统体育 (武)',
-    desc: '本分类内容以云端正式发布为准。'
+    desc: '精选内容持续更新中。'
   },
   food: {
     title: '传统饮食 (食)',
-    desc: '本分类内容以云端正式发布为准。'
+    desc: '精选内容持续更新中。'
   },
   medicine: {
     title: '传统医药 (医)',
-    desc: '本分类内容以云端正式发布为准。'
+    desc: '精选内容持续更新中。'
   },
   music: {
     title: '传统音乐 (乐)',
-    desc: '本分类内容以云端正式发布为准。'
+    desc: '精选内容持续更新中。'
   }
 };
 
