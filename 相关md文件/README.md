@@ -1,4 +1,4 @@
-﻿# 遗韵养生微信小程序
+# 遗韵养生微信小程序
 
 “遗韵养生”是一款基于微信小程序原生开发和微信云开发能力实现的非遗养生内容应用。项目当前包含内容浏览、健康打卡、AI 问答、个人资料、收藏、反馈、协议展示等核心模块，适合继续进行真机联调、审核准备与版本维护。
 
@@ -96,128 +96,108 @@ pages/
 
 ## 5. 数据库集合说明
 
-下面是当前项目里最关键的云数据库集合，建议新接手项目时先理解这一部分。
+下面是当前项目里最关键的云数据库集合。为了方便新手快速看懂，这里拆成两部分：
 
-### 5.1 `users`
+- 先看“每个集合是干什么的”
+- 再看“这些集合里最关键的字段有哪些”
 
-作用：保存用户基础资料。
+### 5.1 集合作用
 
-常见字段：
+- `users`：保存用户基础资料，例如昵称、头像和业务身份标识。
+- `user_settings`：保存用户设置项和健康打卡目标。
+- `checkin_records`：保存用户每天的打卡记录和统计结果。
+- `content_favorites`：保存用户收藏的内容详情。
+- `ai_favorites`：保存用户收藏的 AI 问答。
+- `campaign_contents`：保存首页活动、宣传内容和轮播候选数据。
+- `heritage_contents`：保存分类、详情、推荐和打卡项目来源内容。
+- `user_feedback`：保存用户在反馈页提交的问题和联系方式。
 
-- `openid`：业务主标识
-- `nickname`：昵称
-- `avatarUrl`：头像地址
-- `createTime`
-- `updateTime`
+### 5.2 关键字段
 
-谁会用到：
+- `users`
+  - `openid`
+  - `nickname`
+  - `avatarUrl`
+  - `createTime`
+  - `updateTime`
 
-- `login` 云函数
-- `pages/profile/profile`
-- `pages/login/login`
+- `user_settings`
+  - `openid`
+  - `appPreferences`
+  - `checkinGoals`
+  - `createTime`
+  - `updateTime`
 
-### 5.2 `user_settings`
+- `checkin_records`
+  - `openid`
+  - `date`
+  - `weight`
+  - `projects`
+  - `durations`
+  - `calories`
+  - `health`
+  - `cultivation`
 
-作用：保存用户设置与打卡目标。
+- `content_favorites`
+  - `openid`
+  - `favoriteKey`
+  - `contentId`
+  - `contentType`
+  - `detailId`
+  - `title`
+  - `cover`
+  - `intro`
 
-常见字段：
+- `ai_favorites`
+  - `openid`
+  - `favoriteKey`
+  - `question`
+  - `answer`
+  - `source`
+  - `createTime`
 
-- `openid`
-- `appPreferences`：通知偏好等
-- `checkinGoals`：打卡目标
-- `createTime`
-- `updateTime`
+- `campaign_contents`
+  - `title`
+  - `summary`
+  - `cover`
+  - `date`
+  - `status`
+  - `sort`
+  - `showInBanner`
+  - `bannerSort`
 
-谁会用到：
+- `heritage_contents`
+  - `title`
+  - `summary`
+  - `category` 或 `categoryId`
+  - `cover`
+  - `intro`
+  - `section1Title`
+  - `section1Content`
+  - `section2Title`
+  - `section2Content`
+  - `videoUrl`
+  - `isDailyRecommend`
+  - `showOnHome`
+  - `status`
+  - `sort`
 
-- `pages/settings/settings`
-- `pages/checkin/checkin`
-- `utils/dataSync.js`
+- `user_feedback`
+  - `content`
+  - `contact`
+  - `status`
+  - `createTime`
+  - `updateTime`
 
-### 5.3 `checkin_records`
+### 5.3 这些集合分别会被哪些模块使用
 
-作用：保存用户每日打卡记录。
-
-常见字段：
-
-- `openid`
-- `date`
-- `weight`
-- `projects`
-- `durations`
-- `calories`
-- `health`
-- `cultivation`
-- `createTime`
-- `updateTime`
-
-谁会用到：
-
-- `pages/checkin/checkin`
-- `utils/dataSync.js`
-
-### 5.4 `content_favorites`
-
-作用：保存用户对内容详情的收藏。
-
-常见字段：
-
-- `openid`
-- `favoriteKey`
-- `contentId`
-- `contentType`
-- `detailId`
-- `title`
-- `cover`
-- `tag`
-- `date`
-- `intro`
-- `createTime`
-- `updateTime`
-
-谁会用到：
-
-- `pages/detail/detail`
-- `pages/favorites/favorites`
-- `utils/dataSync.js`
-
-### 5.5 `ai_favorites`
-
-作用：保存用户主动收藏的 AI 问答。
-
-常见字段：
-
-- `openid`
-- `favoriteKey`
-- `question`
-- `answer`
-- `source`
-- `createTime`
-
-谁会用到：
-
-- `pages/ai/ai`
-- `pages/message/message`
-- `utils/dataSync.js`
-
-### 5.6 `campaign_contents`
-
-作用：保存首页活动、宣传内容和轮播候选数据。
-
-常见字段：
-
-- `title`
-- `summary`
-- `cover`
-- `date`
-- `status`
-- `sort`
-- `showInBanner`
-- `bannerSort`
-
-谁会用到：
-
-- `pages/index/index`
+- 首页：`campaign_contents`、`heritage_contents`
+- 分类页：`heritage_contents`
+- 详情页：`campaign_contents`、`heritage_contents`、`content_favorites`
+- 打卡页：`heritage_contents`、`checkin_records`、`user_settings`
+- AI 页：`ai_favorites`
+- 个人中心：`users`
+- 反馈页：`user_feedback`
 - `pages/detail/detail`
 
 ### 5.7 `heritage_contents`
