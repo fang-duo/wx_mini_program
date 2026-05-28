@@ -5,7 +5,7 @@ Page({
     chatList: [{ 
       id: 'first', 
       role: 'ai', 
-      content: '您好，我是非遗健康AI助手。请问有什么我可以帮您的？' 
+      content: '您好，我是遗韵养生 AI 助手。请问有什么我可以帮您的？' 
     }],
     scrollToMessage: '' // 用于控制页面滚动
   },

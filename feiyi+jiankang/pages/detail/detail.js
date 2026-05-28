@@ -36,18 +36,30 @@ async function queryFirstAvailableCollection(db, collectionNames, executor) {
   return null;
 }
 
-function createEmptyArticle({ title = '', itemId = '', contentType = 'heritage' } = {}) {
-  const defaultTitle = title || (contentType === 'campaign' ? '活动详情' : '非遗详情');
-
+function getFallbackArticleData(title) {
   return {
-    id: itemId,
-    contentType,
     detailId: '',
-    title: defaultTitle,
+    title: title || '内容详情',
     cover: '',
-    tag: contentType === 'campaign' ? '活动宣传' : '非遗内容',
+    tag: '非遗内容',
     date: '',
-    intro: '',
+    intro: '当前内容以云端发布为准，暂无详细介绍。',
+    section1Title: '',
+    section1Content: '',
+    section2Title: '',
+    section2Content: '',
+    hasPractice: false,
+    videoUrl: ''
+  };
+}
+
+function getFallbackCampaignData(title) {
+  return {
+    title: title || '活动详情',
+    cover: '',
+    tag: '活动宣传',
+    date: '',
+    intro: '当前活动详情以云端发布为准，暂无详细介绍。',
     section1Title: '',
     section1Content: '',
     section2Title: '',
@@ -59,17 +71,30 @@ function createEmptyArticle({ title = '', itemId = '', contentType = 'heritage' 
 
 Page({
   data: {
-    loadingArticle: true,
-    articleNotFound: false,
     isStarred: false,
-    article: createEmptyArticle()
+    article: {
+      id: '',
+      contentType: 'heritage',
+      detailId: '',
+      title: '加载中...',
+      cover: '',
+      tag: '',
+      date: '',
+      intro: '',
+      section1Title: '',
+      section1Content: '',
+      section2Title: '',
+      section2Content: '',
+      hasPractice: false,
+      videoUrl: ''
+    }
   },
 
   onLoad(options) {
     if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
       return;
     }
-    const title = decodeURIComponent(options.title || '');
+    const title = decodeURIComponent(options.title || '内容详情');
     const itemId = decodeURIComponent(options.itemId || '');
     const contentType = decodeURIComponent(options.contentType || 'heritage');
     this.loadArticleData({ title, itemId, contentType });
@@ -80,24 +105,22 @@ Page({
   },
 
   async loadArticleData({ title, itemId, contentType }) {
-    const emptyArticle = createEmptyArticle({ title, itemId, contentType });
+    const fallbackData = contentType === 'campaign'
+      ? getFallbackCampaignData(title)
+      : getFallbackArticleData(title);
 
     this.setData({
-      loadingArticle: true,
-      articleNotFound: false,
-      isStarred: false,
-      article: emptyArticle
+      article: {
+        ...fallbackData,
+        id: itemId || '',
+        contentType,
+        detailId: fallbackData.detailId || ''
+      }
     });
+    this.checkStarStatus();
     wx.setNavigationBarTitle({ title: contentType === 'campaign' ? '活动详情' : '非遗详情' });
 
-    if (!wx.cloud) {
-      this.setData({
-        loadingArticle: false,
-        articleNotFound: true
-      });
-      wx.setNavigationBarTitle({ title: '暂无内容' });
-      return;
-    }
+    if (!wx.cloud) return;
 
     const db = wx.cloud.database();
 
@@ -118,55 +141,33 @@ Page({
       });
 
       const cloudData = (detailRes.data && (Array.isArray(detailRes.data) ? detailRes.data[0] : detailRes.data)) || null;
-      if (!cloudData || (typeof cloudData.status === 'boolean' && !cloudData.status)) {
-        this.setData({
-          loadingArticle: false,
-          articleNotFound: true
-        });
-        wx.setNavigationBarTitle({ title: '暂无内容' });
-        return;
-      }
+      if (!cloudData) return;
 
       const article = {
         id: cloudData._id || itemId || '',
         contentType,
-        detailId: cloudData.detailId || '',
-        title: cloudData.title || emptyArticle.title,
-        cover: normalizeMediaValue(cloudData.cover),
-        tag: cloudData.tag || (contentType === 'campaign' ? '活动宣传' : '非遗内容'),
-        date: cloudData.date || '',
-        intro: cloudData.intro || cloudData.summary || cloudData.content || '',
-        section1Title: cloudData.section1Title || ((cloudData.introduction || cloudData.section1Content) ? '内容介绍' : ''),
-        section1Content: cloudData.introduction || cloudData.section1Content || '',
-        section2Title: cloudData.section2Title || ((cloudData.tips || cloudData.section2Content) ? '补充说明' : ''),
-        section2Content: cloudData.tips || cloudData.section2Content || '',
-        hasPractice: typeof cloudData.hasPractice === 'boolean' ? cloudData.hasPractice : false,
-        videoUrl: normalizeMediaValue(cloudData.videoUrl)
+        detailId: cloudData.detailId || fallbackData.detailId || '',
+        title: cloudData.title || fallbackData.title,
+        cover: normalizeMediaValue(cloudData.cover) || fallbackData.cover,
+        tag: cloudData.tag || (contentType === 'campaign' ? '活动宣传' : fallbackData.tag),
+        date: cloudData.date || fallbackData.date,
+        intro: cloudData.intro || cloudData.content || fallbackData.intro,
+        section1Title: cloudData.section1Title || (contentType === 'campaign' ? '活动介绍' : fallbackData.section1Title),
+        section1Content: cloudData.introduction || cloudData.section1Content || fallbackData.section1Content,
+        section2Title: cloudData.section2Title || (contentType === 'campaign' ? '温馨提示' : fallbackData.section2Title),
+        section2Content: cloudData.tips || cloudData.section2Content || fallbackData.section2Content,
+        hasPractice: typeof cloudData.hasPractice === 'boolean' ? cloudData.hasPractice : fallbackData.hasPractice,
+        videoUrl: normalizeMediaValue(cloudData.videoUrl) || fallbackData.videoUrl
       };
 
-      this.setData({
-        article,
-        loadingArticle: false,
-        articleNotFound: false
-      });
-      wx.setNavigationBarTitle({ title: article.title || (contentType === 'campaign' ? '活动详情' : '非遗详情') });
+      this.setData({ article });
       this.checkStarStatus();
     } catch (error) {
       console.error('详情页云端内容加载失败：', error);
-      this.setData({
-        loadingArticle: false,
-        articleNotFound: true
-      });
-      wx.setNavigationBarTitle({ title: '暂无内容' });
     }
   },
 
   async checkStarStatus() {
-    if (this.data.articleNotFound) {
-      this.setData({ isStarred: false });
-      return;
-    }
-
     const currentKey = this.getFavoriteKey(this.data.article);
     if (!currentKey) {
       this.setData({ isStarred: false });

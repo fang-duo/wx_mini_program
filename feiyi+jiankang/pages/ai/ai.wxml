@@ -19,7 +19,7 @@
   </view>
 
   <view class="medical-disclaimer">
-    <text class="medical-disclaimer-text">AI 回答问题仅供参考，不替代专业医疗建议。</text>
+    <text class="medical-disclaimer-text">AI 回答仅用于传统养生与健康科普参考，不提供疾病诊断、处方用药、急症处理或特殊人群个性化建议。</text>
   </view>
 
   <view class="header-actions" wx:if="{{qaPairs.length > 0 && isLoggedIn}}">
@@ -36,7 +36,7 @@
   <scroll-view scroll-y class="chat-list" scroll-into-view="{{scrollToMessage}}">
     <view class="ai-header" wx:if="{{messages.length <= 1}}">
       <view class="ai-avatar-large">AI</view>
-      <text class="ai-welcome-text">您好，我是非遗健康AI助手。请问有什么我可以帮您的？</text>
+      <text class="ai-welcome-text">您好，我是遗韵养生 AI 助手。请问有什么我可以帮您的？</text>
     </view>
 
     <view class="recommend-section" wx:if="{{messages.length <= 1 && recommends.length > 0}}">

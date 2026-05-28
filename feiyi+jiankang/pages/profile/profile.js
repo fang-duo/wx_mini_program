@@ -388,7 +388,7 @@ Page({
       wx.navigateTo({ url: '/pages/settings/settings' });
     } else {
       wx.showToast({
-        title: title + ' 功能正在完善中',
+        title: title + ' 当前暂不可用',
         icon: 'none'
       });
     }

@@ -1,54 +1,42 @@
 <view class="container">
-  <view class="loading-state" wx:if="{{loadingArticle}}">
-    <view class="loading-title">正在加载内容</view>
-    <view class="loading-desc">内容加载中，请稍候。</view>
+  <!-- 顶部封面 -->
+  <view class="cover-box">
+    <image class="cover-img" src="{{article.cover}}" mode="aspectFill" wx:if="{{article.cover}}"></image>
+    <view class="cover-mask"></view>
+    <view class="title-wrap">
+      <view class="title">{{article.title}}</view>
+      <view class="meta">
+        <text class="tag">{{article.tag}}</text>
+        <text class="date">{{article.date}}</text>
+      </view>
+    </view>
   </view>
 
-  <view class="empty-state" wx:elif="{{articleNotFound}}">
-    <view class="empty-title">暂无相关内容</view>
-    <view class="empty-desc">你访问的内容暂时没有展示信息，请稍后再试。</view>
+  <!-- 内容区域 -->
+  <view class="content-box">
+    <!-- 简介/引言 -->
+    <view class="intro-card">
+      <view class="quote-icon">“</view>
+      <text class="intro-text">{{article.intro}}</text>
+    </view>
+
+    <!-- 模拟富文本内容 -->
+    <view class="rich-content">
+      <view class="section-title" wx:if="{{article.section1Title}}">{{article.section1Title}}</view>
+      <view class="paragraph" wx:if="{{article.section1Content}}">{{article.section1Content}}</view>
+
+      <view class="section-title" wx:if="{{article.section2Title}}">{{article.section2Title}}</view>
+      <view class="paragraph" wx:if="{{article.section2Content}}">{{article.section2Content}}</view>
+    </view>
   </view>
 
-  <block wx:else>
-    <!-- 顶部封面 -->
-    <view class="cover-box">
-      <image class="cover-img" src="{{article.cover}}" mode="aspectFill" wx:if="{{article.cover}}"></image>
-      <view class="cover-mask"></view>
-      <view class="title-wrap">
-        <view class="title">{{article.title}}</view>
-        <view class="meta">
-          <text class="tag">{{article.tag}}</text>
-          <text class="date">{{article.date}}</text>
-        </view>
-      </view>
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view class="action-btn" bindtap="toggleStar">
+      <text class="action-icon">{{isStarred ? '⭐' : '☆'}}</text>
+      <text class="action-text">{{isStarred ? '已收藏' : '收藏'}}</text>
     </view>
-
-    <!-- 内容区域 -->
-    <view class="content-box">
-      <view class="intro-card" wx:if="{{article.intro}}">
-        <view class="quote-icon">“</view>
-        <text class="intro-text">{{article.intro}}</text>
-      </view>
-
-      <view class="rich-content" wx:if="{{article.intro || article.section1Content || article.section2Content}}">
-        <view class="section-title" wx:if="{{article.section1Title}}">{{article.section1Title}}</view>
-        <view class="paragraph" wx:if="{{article.section1Content}}">{{article.section1Content}}</view>
-
-        <view class="section-title" wx:if="{{article.section2Title}}">{{article.section2Title}}</view>
-        <view class="paragraph" wx:if="{{article.section2Content}}">{{article.section2Content}}</view>
-      </view>
-
-      <view class="empty-inline" wx:else>当前暂无详细介绍。</view>
-    </view>
-
-    <!-- 底部操作栏 -->
-    <view class="bottom-bar">
-      <view class="action-btn" bindtap="toggleStar">
-        <text class="action-icon">{{isStarred ? '⭐' : '☆'}}</text>
-        <text class="action-text">{{isStarred ? '已收藏' : '收藏'}}</text>
-      </view>
-      <view class="footer-btn" bindtap="goToVideo">开始练习</view>
-      <view class="main-btn btn-ai" bindtap="askAI">向AI提问</view>
-    </view>
-  </block>
+    <view class="footer-btn" bindtap="goToVideo">开始练习</view>
+    <view class="main-btn btn-ai" bindtap="askAI">向AI提问</view>
+  </view>
 </view>

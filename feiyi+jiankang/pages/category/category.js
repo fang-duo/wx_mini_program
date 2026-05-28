@@ -30,19 +30,19 @@ async function queryFirstAvailableCollection(db, collectionNames, executor) {
 const CATEGORY_META_MAP = {
   sports: {
     title: '传统体育 (武)',
-    desc: '精选内容持续更新中。'
+    desc: '传承千年功法，强健民族体魄。通过柔和连绵的肢体运动，调和五脏六腑。'
   },
   food: {
     title: '传统饮食 (食)',
-    desc: '精选内容持续更新中。'
+    desc: '药食同源，顺应四时。在日常三餐中蕴含着古人顺应自然的养生智慧。'
   },
   medicine: {
     title: '传统医药 (医)',
-    desc: '精选内容持续更新中。'
+    desc: '辨证施治，针药并用。中华医药是古代科学的瑰宝，蕴含深厚的哲学思想。'
   },
   music: {
     title: '传统音乐 (乐)',
-    desc: '精选内容持续更新中。'
+    desc: '百病生于气而止于音。五音对应五脏，聆听古乐可达到静心安神、缓解焦虑之效。'
   }
 };
 

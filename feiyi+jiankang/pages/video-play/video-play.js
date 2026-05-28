@@ -23,10 +23,20 @@ Page({
       return;
     }
 
-    if (!rawUrl.startsWith('cloud://') || !wx.cloud) {
+    if (!rawUrl.startsWith('cloud://')) {
       this.setData({
-        finalUrl: rawUrl,
+        loading: false,
+        errorMessage: '当前视频仅支持云存储资源，请在云后台配置有效视频。'
+      });
+      return;
+    }
+
+    if (!wx.cloud) {
+      this.setData({
         loading: false
+      });
+      this.setData({
+        errorMessage: '当前环境暂不支持解析云存储视频。'
       });
       return;
     }

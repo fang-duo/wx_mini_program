@@ -53,10 +53,19 @@ const FIXED_CATEGORIES = [
   { id: 'music', name: '传统音乐', iconText: '乐' }
 ];
 
+function createEmptyDailyRecommend() {
+  return {
+    id: '',
+    title: '',
+    summary: '',
+    contentType: 'heritage'
+  };
+}
+
 Page({
   data: {
     banners: [],
-    categories: FIXED_CATEGORIES,
+    categories: [],
     articles: [],
     dailyRecommend: null,
     loadingHomeContent: true,
@@ -78,8 +87,7 @@ Page({
       banners: [],
       categories: FIXED_CATEGORIES,
       articles: [],
-      dailyRecommend: null,
-      loadingHomeContent: true
+      dailyRecommend: createEmptyDailyRecommend()
     });
 
     if (!wx.cloud) {
@@ -163,7 +171,7 @@ Page({
       const dailyRecommend =
         dailyRecommendCandidates[0] ||
         homeRecommendCandidates[0] ||
-        null;
+        createEmptyDailyRecommend();
 
       this.setData({
         banners,
@@ -242,7 +250,7 @@ Page({
     });
 
     wx.showToast({
-      title: '当前为基础浏览模式',
+      title: '当前为仅浏览模式',
       icon: 'none'
     });
   },

@@ -19,7 +19,7 @@
   <block wx:elif="{{!isLoggedIn}}">
     <view class="guest-hero bg-primary">
       <view class="guest-avatar">未</view>
-      <view class="guest-title">欢迎使用非遗健康小程序</view>
+      <view class="guest-title">欢迎使用遗韵养生</view>
     </view>
 
     <view class="guest-card">
@@ -107,7 +107,7 @@
 
 <view class="sheet-mask" wx:if="{{showLoginSheet}}" bindtap="closeLoginSheet">
   <view class="login-sheet" catchtap="stopPropagation">
-    <view class="sheet-title">欢迎使用非遗健康小程序</view>
+    <view class="sheet-title">欢迎使用遗韵养生</view>
     <view class="sheet-subtitle">登录后可同步你的收藏、健康打卡和个人资料。</view>
 
     <view class="agreement-item">

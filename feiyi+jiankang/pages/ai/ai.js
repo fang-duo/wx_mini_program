@@ -1,7 +1,7 @@
 const DEFAULT_MESSAGE = {
   id: 'welcome',
   role: 'ai',
-  content: '您好，我是非遗健康AI助手。请问有什么我可以帮您的？'
+  content: '您好，我是遗韵养生 AI 助手。请问有什么我可以帮您的？'
 };
 
 const {
