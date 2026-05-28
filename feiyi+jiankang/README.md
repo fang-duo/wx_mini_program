@@ -1,115 +1,321 @@
-# 遗韵养生微信小程序
+﻿# 遗韵养生微信小程序
 
-“遗韵养生”是一款结合非遗文化与健康养生内容的微信小程序，当前项目已具备页面展示、云端内容读取、用户资料同步、健康打卡、内容收藏和 AI 问答等核心能力，适合作为课程项目、演示项目或继续上线收口的基础版本。
+“遗韵养生”是一款基于微信小程序原生开发和微信云开发能力实现的非遗养生内容应用。项目当前包含内容浏览、健康打卡、AI 问答、个人资料、收藏、反馈、协议展示等核心模块，适合继续进行真机联调、审核准备与版本维护。
 
-## 技术栈
+## 1. 这个项目能做什么
 
-- 前端：微信小程序原生开发，使用 `WXML`、`WXSS`、`JavaScript`
-- 云能力：微信云开发
-- 数据层：云数据库、云存储
-- 云函数：`login`、`aiChat`、`migrateLegacyData`
-- 本地与云端协同：`utils/dataSync.js`
+当前版本的核心能力如下：
 
-## 当前功能
+- 首页读取云端活动内容与推荐内容。
+- 分类页按 `传统体育 / 传统饮食 / 传统医药 / 传统音乐` 展示内容。
+- 详情页支持图文信息、收藏、视频播放入口。
+- 健康打卡支持按日期记录项目、时长、体重与目标。
+- AI 问答支持快捷提问、自由提问、问答收藏。
+- 个人中心支持真实微信身份登录、昵称修改、头像上传。
+- 设置页支持通知偏好、本地缓存清理。
+- 反馈页支持提交问题与联系信息。
+- 协议页支持查看《隐私政策》《用户协议》《AI 使用说明》。
 
-### 1. 首页与内容浏览
+## 2. 技术方案
 
-- 首页支持轮播、推荐内容、四大分类入口
-- 内容优先读取云数据库，失败时保留本地兜底
-- 分类页支持按主题查看非遗健康内容
-- 详情页支持图文介绍、贴士和视频入口
-- 首次进入首页会弹出隐私保护提示，支持“同意并继续”或“不同意，仅浏览”
+### 2.1 前端
 
-### 2. 健康打卡
+- 原生微信小程序
+- `WXML` 负责页面结构
+- `WXSS` 负责页面样式
+- `JavaScript` 负责页面逻辑
 
-- 支持按日期记录体重、项目、时长或数量
-- 自动计算卡路里、健康值、修养值
-- 支持保存打卡目标
-- 支持本地缓存与云端同步打卡历史
+### 2.2 云能力
 
-### 3. AI 问答
+- 微信云开发
+- 云数据库
+- 云存储
+- 云函数
 
-- AI 页面支持快捷问题和自由提问
-- 前端通过 `aiChat` 云函数调用外部大模型接口
-- 支持收藏有价值的问答
-- 离开页面前可提醒用户先收藏重要内容
-- 支持“稍后提醒”和“以后不再提醒”两种提醒处理方式
-- 页面固定展示“AI 回答问题仅供参考，不替代专业医疗建议”
+### 2.3 当前云函数
 
-### 4. 个人中心与设置
+- `login`：获取当前用户 `openid`，并读取用户基础信息。
+- `aiChat`：代理 AI 模型请求，统一做提示词和基础风控。
+- `migrateLegacyData`：用于旧数据补齐与迁移。
 
-- 支持基于微信云函数 `login` 的真实身份登录，以 `openid` 作为登录主标识
-- 支持微信登录后的用户资料读取与保存
-- 支持昵称编辑、头像上传
-- 支持查看内容收藏与 AI 收藏
-- 支持通知偏好设置与缓存清理
+### 2.4 当前云环境
 
-### 5. 访问模式与隐私流程
+- 默认云环境：`cloud2-d5gq377icbed53c7e`
+- 初始化位置：`app.js`
 
-- 未同意隐私政策时，可进入“仅浏览模式”
-- 仅浏览模式下可查看首页、分类、详情和协议说明
-- 同意隐私政策后可开启登录、AI、打卡、收藏等完整功能
-- 隐私协议处理结果会缓存到本地，重新编译不会自动再次弹出
+## 3. 页面结构
 
-## 页面结构
-
-当前已配置页面如下：
+当前 `app.json` 中注册的页面如下：
 
 ```text
 pages/
-├── index/        # 首页
-├── login/        # 微信登录入口
-├── checkin/      # 健康打卡
-├── ai/           # AI 问答
-├── profile/      # 个人中心
-├── video-play/   # 视频播放
-├── category/     # 分类列表
-├── detail/       # 内容详情
-├── account/      # 账号信息
-├── favorites/    # 内容收藏
-├── message/      # AI 收藏
-├── feedback/     # 帮助与反馈
-└── settings/     # 设置
+├── index/        首页
+├── agreement/    协议页
+├── checkin/      健康打卡
+├── ai/           AI 问答
+├── profile/      个人中心
+├── video-play/   视频播放
+├── category/     分类页
+├── detail/       详情页
+├── account/      账号信息
+├── favorites/    内容收藏
+├── message/      AI 收藏
+├── feedback/     帮助与反馈
+└── settings/     设置
 ```
 
-底部 `TabBar` 当前包含：
+底部 `TabBar` 页面：
 
 - 首页
 - 健康打卡
 - AI 问答
 - 个人中心
 
-## 核心目录
+## 4. 目录说明
 
 ```text
 .
-├── app.js
-├── app.json
-├── app.wxss
-├── pages/
-├── cloudfunctions/
-│   ├── aiChat/
-│   ├── login/
-│   └── migrateLegacyData/
-├── utils/
-│   └── dataSync.js
-├── images/
-├── AI使用说明.md
-├── function.md
-├── legacy-data-migration.md
-├── 用户协议.md
-└── 隐私政策.md
+├── app.js                        小程序启动与云环境初始化
+├── app.json                      页面注册与全局窗口配置
+├── pages/                        页面目录
+├── cloudfunctions/               云函数目录
+├── utils/                        通用工具与数据同步逻辑
+├── images/                       本地保留图标资源
+├── README.md                     项目总说明
+├── 真机验证清单.md               真机检查清单
+├── 用户协议.md                   用户协议文档
+├── 隐私政策.md                   隐私政策文档
+├── AI使用说明.md                 AI 使用说明文档
+├── function.md                   当前功能现状与上线收口说明
+├── 功能需求.md                   当前版本功能范围说明
+├── teach.md                      新手部署与维护指南
+├── legacy-data-migration.md      旧数据迁移说明
+├── history.md                    文档与版本整理记录
+└── debug-account-delete.md       账号注销问题归档说明
 ```
 
-## 云开发说明
+## 5. 数据库集合说明
 
-项目当前依赖微信云开发能力，主要涉及：
+下面是当前项目里最关键的云数据库集合，建议新接手项目时先理解这一部分。
 
-- `login`：获取用户真实微信身份 `openid`，并读取或初始化用户数据
-- `aiChat`：代理 AI 模型调用
-- `migrateLegacyData`：用于旧数据迁移和结构修复
+### 5.1 `users`
 
-主要数据集合包括：
+作用：保存用户基础资料。
+
+常见字段：
+
+- `openid`：业务主标识
+- `nickname`：昵称
+- `avatarUrl`：头像地址
+- `createTime`
+- `updateTime`
+
+谁会用到：
+
+- `login` 云函数
+- `pages/profile/profile`
+- `pages/login/login`
+
+### 5.2 `user_settings`
+
+作用：保存用户设置与打卡目标。
+
+常见字段：
+
+- `openid`
+- `appPreferences`：通知偏好等
+- `checkinGoals`：打卡目标
+- `createTime`
+- `updateTime`
+
+谁会用到：
+
+- `pages/settings/settings`
+- `pages/checkin/checkin`
+- `utils/dataSync.js`
+
+### 5.3 `checkin_records`
+
+作用：保存用户每日打卡记录。
+
+常见字段：
+
+- `openid`
+- `date`
+- `weight`
+- `projects`
+- `durations`
+- `calories`
+- `health`
+- `cultivation`
+- `createTime`
+- `updateTime`
+
+谁会用到：
+
+- `pages/checkin/checkin`
+- `utils/dataSync.js`
+
+### 5.4 `content_favorites`
+
+作用：保存用户对内容详情的收藏。
+
+常见字段：
+
+- `openid`
+- `favoriteKey`
+- `contentId`
+- `contentType`
+- `detailId`
+- `title`
+- `cover`
+- `tag`
+- `date`
+- `intro`
+- `createTime`
+- `updateTime`
+
+谁会用到：
+
+- `pages/detail/detail`
+- `pages/favorites/favorites`
+- `utils/dataSync.js`
+
+### 5.5 `ai_favorites`
+
+作用：保存用户主动收藏的 AI 问答。
+
+常见字段：
+
+- `openid`
+- `favoriteKey`
+- `question`
+- `answer`
+- `source`
+- `createTime`
+
+谁会用到：
+
+- `pages/ai/ai`
+- `pages/message/message`
+- `utils/dataSync.js`
+
+### 5.6 `campaign_contents`
+
+作用：保存首页活动、宣传内容和轮播候选数据。
+
+常见字段：
+
+- `title`
+- `summary`
+- `cover`
+- `date`
+- `status`
+- `sort`
+- `showInBanner`
+- `bannerSort`
+
+谁会用到：
+
+- `pages/index/index`
+- `pages/detail/detail`
+
+### 5.7 `heritage_contents`
+
+作用：保存分类、详情、推荐、打卡项目来源数据。
+
+常见字段：
+
+- `title`
+- `summary`
+- `category` 或 `categoryId`
+- `cover`
+- `tag`
+- `intro`
+- `section1Title`
+- `section1Content`
+- `section2Title`
+- `section2Content`
+- `videoUrl`
+- `isDailyRecommend`
+- `showOnHome`
+- `status`
+- `sort`
+
+谁会用到：
+
+- `pages/index/index`
+- `pages/category/category`
+- `pages/detail/detail`
+- `pages/checkin/checkin`
+
+### 5.8 `user_feedback`
+
+作用：保存用户在反馈页提交的问题与联系方式。
+
+常见字段：
+
+- `content`
+- `contact`
+- `status`
+- `createTime`
+- `updateTime`
+
+谁会用到：
+
+- `pages/feedback/feedback`
+
+## 6. 本地缓存说明
+
+项目并不是所有数据都只存在云端，以下内容会在本地缓存：
+
+- `local_user_info`
+- `app_preferences`
+- `favorites`
+- `checkin_goals`
+- `checkin_history`
+- `ai_exit_remind_disabled`
+- `logs`
+- `privacy_state`
+
+主要用途：
+
+- 提高页面打开速度
+- 减少重复请求
+- 支持部分离线体验
+- 保存用户的隐私选择与偏好
+
+## 7. 新手如何跑起来
+
+如果你是第一次接手这个项目，建议按下面顺序操作。
+
+### 第一步：导入项目
+
+1. 安装微信开发者工具。
+2. 导入目录 `feiyi+jiankang/`。
+3. 使用当前小程序对应的 `AppID` 打开项目。
+
+### 第二步：检查云环境
+
+1. 打开 `app.js`。
+2. 确认 `wx.cloud.init` 中的 `env` 正确。
+3. 在开发者工具中确认当前绑定的是同一个云环境。
+
+### 第三步：检查云函数
+
+至少确认以下云函数已经上传部署：
+
+- `login`
+- `aiChat`
+- `migrateLegacyData`
+
+其中 `aiChat` 还要确认环境变量：
+
+- `DEEPSEEK_API_KEY`
+
+### 第四步：检查数据库
+
+至少确认以下集合存在且权限合理：
 
 - `users`
 - `user_settings`
@@ -118,45 +324,74 @@ pages/
 - `ai_favorites`
 - `campaign_contents`
 - `heritage_contents`
+- `user_feedback`
 
-## 运行方式
+推荐权限：
 
-1. 安装 [微信开发者工具](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
-2. 导入当前目录 `feiyi+jiankang/`
-3. 使用可用 `AppID` 或测试号打开项目
-4. 确认云环境、数据库集合和云函数已正确配置
-5. 如需联调 AI，先部署 `cloudfunctions/aiChat`
+- 用户私有数据集合：`仅创建者可读写`
+- 公共内容集合：`所有用户可读，仅创建者可读写`
 
-## 近期更新
+### 第五步：真机验证
 
-- 登录链路已统一为真实微信身份登录，不再依赖旧的模拟登录思路
-- 个人中心登录弹层按钮、首页隐私弹窗按钮已调整为按钮内文字居中
-- AI 页面新增医疗免责声明提示
-- AI 会话顶部提醒新增“稍后提醒”交互，本次隐藏提示但不关闭离页提醒
-- 隐私弹窗流程已接入本地缓存，避免每次进入重复打扰
+执行 `真机验证清单.md` 中的所有检查项。
 
-## 联调建议
+## 8. 上线前重点关注
 
-首次接手项目时，建议按下面顺序检查：
+### 8.1 内容合规
 
-1. 先确认 `app.js` 中云环境初始化是否可用
-2. 再验证 `login` 云函数是否能正常返回 `openid`
-3. 检查数据库集合与权限是否齐全
-4. 验证首页内容、收藏、打卡和设置是否能正常读写
-5. 最后联调 `aiChat` 云函数和 AI 收藏流程
+- 页面文案不要出现“开发中”“敬请期待”“演示数据”等表述。
+- 公共内容尽量来自真实云端数据。
+- 视频、图片、文字内容要有明确来源和使用授权。
 
-## 相关文档
+### 8.2 AI 合规
 
-- `function.md`：当前完成度、上线差距与后续推进建议
-- `AI使用说明.md`：AI 功能使用规范与免责声明
-- `legacy-data-migration.md`：旧数据迁移步骤与验收说明
-- `用户协议.md`：用户协议文案
-- `隐私政策.md`：隐私政策文案
+- AI 只适合做传统养生与一般健康科普。
+- 不要让 AI 提供诊断、处方、剂量、急救处理方案。
+- 页面和协议要保留必要免责声明。
 
-## 当前状态说明
+### 8.3 隐私与账号
 
-- 该项目已经不是纯静态 Demo
-- 核心功能主流程已基本跑通
-- 目前更适合继续做真机联调、云环境验收和提审准备
-- 若要正式上线，仍需完成云函数部署、数据库验收、AI 合规说明和提审资料整理
-- 当前文档状态已覆盖最近一轮登录、隐私协议与 AI 提示交互调整
+- 登录方式以微信身份为准。
+- 协议文案要和页面展示一致。
+- 用户反馈、收藏、打卡等集合要保证隔离。
+
+## 9. 常见问题
+
+### Q1：为什么首页没有内容？
+
+通常是以下原因之一：
+
+- `campaign_contents` 没有正式数据
+- `heritage_contents` 没有正式数据
+- 云环境不一致
+- 当前数据 `status` 未开启
+
+### Q2：为什么 AI 不返回？
+
+优先检查：
+
+- `aiChat` 是否已部署
+- `DEEPSEEK_API_KEY` 是否存在
+- 云函数日志是否报错
+- 网络是否正常
+
+### Q3：为什么打卡页没有项目？
+
+打卡页项目来自 `heritage_contents`，需要满足：
+
+- 有 `title`
+- 有可识别的 `category` 或 `categoryId`
+- `status` 为可用状态
+
+## 10. 推荐阅读顺序
+
+如果你是第一次看这个仓库，建议按下面顺序阅读：
+
+1. `README.md`
+2. `真机验证清单.md`
+3. `teach.md`
+4. `function.md`
+5. `legacy-data-migration.md`
+6. `用户协议.md`
+7. `隐私政策.md`
+8. `AI使用说明.md`
