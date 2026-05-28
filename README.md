@@ -96,14 +96,9 @@ pages/
 
 ## 5. 数据库集合说明
 
-下面是当前项目里最关键的云数据库集合。为了方便新手快速看懂，这里拆成两部分：
-
-- 先看“每个集合是干什么的”
-- 再看“这些集合里最关键的字段有哪些”
-
 ### 5.1 集合作用
 
-- `users`：保存用户基础资料，例如昵称、头像和业务身份标识。
+- `users`：保存用户基础资料。
 - `user_settings`：保存用户设置项和健康打卡目标。
 - `checkin_records`：保存用户每天的打卡记录和统计结果。
 - `content_favorites`：保存用户收藏的内容详情。
@@ -112,90 +107,47 @@ pages/
 - `heritage_contents`：保存分类、详情、推荐和打卡项目来源内容。
 - `user_feedback`：保存用户在反馈页提交的问题和联系方式。
 
-### 5.2 关键字段
+### 5.2 关键字段含义
 
-- `users`
-  
-  - `openid`
-  - `nickname`
-  - `avatarUrl`
-  - `createTime`
-  - `updateTime`
-
-- `user_settings`
-  
-  - `openid`
-  - `appPreferences`
-  - `checkinGoals`
-  - `createTime`
-  - `updateTime`
-
-- `checkin_records`
-  
-  - `openid`
-  - `date`
-  - `weight`
-  - `projects`
-  - `durations`
-  - `calories`
-  - `health`
-  - `cultivation`
-
-- `content_favorites`
-  
-  - `openid`
-  - `favoriteKey`
-  - `contentId`
-  - `contentType`
-  - `detailId`
-  - `title`
-  - `cover`
-  - `intro`
-
-- `ai_favorites`
-  
-  - `openid`
-  - `favoriteKey`
-  - `question`
-  - `answer`
-  - `source`
-  - `createTime`
-
-- `campaign_contents`
-  
-  - `title`
-  - `summary`
-  - `cover`
-  - `date`
-  - `status`
-  - `sort`
-  - `showInBanner`
-  - `bannerSort`
-
-- `heritage_contents`
-  
-  - `title`
-  - `summary`
-  - `category` 或 `categoryId`
-  - `cover`
-  - `intro`
-  - `section1Title`
-  - `section1Content`
-  - `section2Title`
-  - `section2Content`
-  - `videoUrl`
-  - `isDailyRecommend`
-  - `showOnHome`
-  - `status`
-  - `sort`
-
-- `user_feedback`
-  
-  - `content`
-  - `contact`
-  - `status`
-  - `createTime`
-  - `updateTime`
+- `openid`：用户业务主标识，用来区分不同用户的数据。
+- `nickname`：用户昵称。
+- `avatarUrl`：用户头像地址，可能是云存储文件地址。
+- `appPreferences`：应用设置项，例如通知偏好。
+- `checkinGoals`：健康打卡目标设置。
+- `date`：记录对应的日期。
+- `weight`：用户填写的体重数据。
+- `projects`：当天选择的打卡项目列表。
+- `durations`：各个打卡项目对应的时长或数量。
+- `calories`：打卡计算出的卡路里结果。
+- `health`：打卡计算出的健康值。
+- `cultivation`：打卡计算出的修养值。
+- `favoriteKey`：收藏去重用的唯一键。
+- `contentId`：内容记录的业务 ID。
+- `contentType`：内容类型，例如活动内容或非遗内容。
+- `detailId`：用于详情页跳转或内容关联的 ID。
+- `title`：内容标题。
+- `summary`：内容摘要或简要说明。
+- `intro`：详情页使用的正文简介。
+- `cover`：封面图地址。
+- `question`：AI 问答中的提问内容。
+- `answer`：AI 问答中的回答内容。
+- `source`：数据来源标记，例如 AI 问答来源。
+- `category` / `categoryId`：内容所属分类，例如传统体育、传统饮食、传统医药、传统音乐。
+- `section1Title`：详情页第一模块标题。
+- `section1Content`：详情页第一模块内容。
+- `section2Title`：详情页第二模块标题。
+- `section2Content`：详情页第二模块内容。
+- `videoUrl`：视频地址，通常用于详情页播放。
+- `isDailyRecommend`：是否作为今日推荐内容。
+- `showOnHome`：是否显示在首页推荐区域。
+- `status`：内容状态，通常用于控制是否展示或是否可用。
+- `sort`：通用排序字段，数值越小通常越靠前。
+- `showInBanner`：是否出现在首页轮播区。
+- `bannerSort`：轮播区专用排序字段。
+- `content`：用户反馈正文。
+- `contact`：用户填写的联系方式。
+- `createTime`：记录创建时间。
+- `updateTime`：记录最后更新时间。
 
 ### 5.3 这些集合分别会被哪些模块使用
 
@@ -206,52 +158,6 @@ pages/
 - AI 页：`ai_favorites`
 - 个人中心：`users`
 - 反馈页：`user_feedback`
-- `pages/detail/detail`
-
-### 5.7 `heritage_contents`
-
-作用：保存分类、详情、推荐、打卡项目来源数据。
-
-常见字段：
-
-- `title`
-- `summary`
-- `category` 或 `categoryId`
-- `cover`
-- `tag`
-- `intro`
-- `section1Title`
-- `section1Content`
-- `section2Title`
-- `section2Content`
-- `videoUrl`
-- `isDailyRecommend`
-- `showOnHome`
-- `status`
-- `sort`
-
-谁会用到：
-
-- `pages/index/index`
-- `pages/category/category`
-- `pages/detail/detail`
-- `pages/checkin/checkin`
-
-### 5.8 `user_feedback`
-
-作用：保存用户在反馈页提交的问题与联系方式。
-
-常见字段：
-
-- `content`
-- `contact`
-- `status`
-- `createTime`
-- `updateTime`
-
-谁会用到：
-
-- `pages/feedback/feedback`
 
 ## 6. 本地缓存说明
 
