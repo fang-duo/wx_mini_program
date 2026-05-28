@@ -20,9 +20,5 @@
       <input class="input" type="text" value="{{userInfo.nickname}}" bindinput="inputNickname" placeholder="请输入昵称" />
     </view>
   </view>
-  
-  <view class="btn-wrap">
-    <button class="btn-save" bindtap="saveInfo">保存修改</button>
-  </view>
   </block>
 </view>

@@ -98,16 +98,3 @@
   margin-left: 20rpx;
   font-family: monospace;
 }
-
-.btn-wrap {
-  margin-top: 80rpx;
-}
-
-.btn-save {
-  background-color: #2E5A42;
-  color: #fff;
-  border-radius: 40rpx;
-  font-size: 32rpx;
-  padding: 20rpx 0;
-  box-shadow: 0 10rpx 20rpx rgba(46, 90, 66, 0.2);
-}

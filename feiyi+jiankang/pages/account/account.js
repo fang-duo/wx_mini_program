@@ -48,18 +48,6 @@ Page({
     });
   },
 
-  saveInfo() {
-    // 同步到全局
-    getApp().globalData.userInfo = this.data.userInfo;
-    wx.showToast({
-      title: '保存成功',
-      icon: 'success'
-    });
-    setTimeout(() => {
-      wx.navigateBack();
-    }, 1500);
-  },
-
   goToProfile() {
     wx.switchTab({
       url: '/pages/profile/profile'
