@@ -27,7 +27,7 @@
 
   <!-- 每日目标 -->
   <view class="card goal-card">
-    <view class="card-title">每日目标</view>
+    <view class="card-title">今日目标</view>
     <view class="goal-items">
       <view class="goal-item">
         <text>卡路里消耗</text>
