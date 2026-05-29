@@ -18,7 +18,7 @@
       <view wx:for="{{weeks}}" wx:key="*this">{{item}}</view>
     </view>
     <view class="days">
-      <view wx:for="{{calendarDays}}" wx:key="date" class="day-item {{item.status}} {{item.isToday ? 'today' : ''}}" bindtap="selectDate" data-date="{{item.date}}">
+      <view wx:for="{{calendarDays}}" wx:key="date" class="day-item {{item.status}} {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.isFuture ? 'future' : ''}}" bindtap="selectDate" data-date="{{item.date}}">
         <text>{{item.day}}</text>
         <view wx:if="{{item.hasRecord}}" class="dot"></view>
       </view>
@@ -51,6 +51,9 @@
   <!-- 打卡记录 -->
   <view class="card record-card">
     <view class="card-title">日期打卡 ({{selectedDate}})</view>
+    <view class="projects-state" wx:if="{{selectedDateLocked}}">
+      过去未打卡的日期不可补录，仅支持修改当日或已存在的历史打卡记录。
+    </view>
     <view class="projects-state" wx:if="{{loadingProjects}}">
       打卡项目加载中，请稍候。
     </view>
@@ -82,7 +85,7 @@
           </view>
         </checkbox-group>
       </view>
-      <button class="btn-submit" bindtap="submitRecord">{{selectedDateRecord ? '修改打卡记录' : '提交打卡记录'}}</button>
+      <button class="btn-submit {{selectedDateLocked ? 'btn-submit-disabled' : ''}}" bindtap="submitRecord" disabled="{{selectedDateLocked}}">{{selectedDateRecord ? '修改打卡记录' : '提交打卡记录'}}</button>
     </block>
   </view>
 

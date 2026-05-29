@@ -11,7 +11,7 @@
   <!-- 顶部 Banner/轮播图 -->
   <swiper class="banner" indicator-dots="{{true}}" autoplay="{{true}}" circular="{{true}}" indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#2E5A42">
     <swiper-item wx:for="{{banners}}" wx:key="id">
-      <view class="banner-item bg-secondary">
+      <view class="banner-item bg-secondary" bindtap="goToDetail" data-title="{{item.title}}" data-item-id="{{item.itemId}}" data-content-type="{{item.contentType}}">
         <image class="banner-img" src="{{item.img}}" mode="aspectFill" wx:if="{{item.img}}" />
         <view class="banner-text">{{item.title}}</view>
       </view>

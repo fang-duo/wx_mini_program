@@ -46,6 +46,14 @@ Page({
       health: 2,
       cultivation: 1
     },
+    goalSettings: {
+      defaultGoals: {
+        calories: 300,
+        health: 2,
+        cultivation: 1
+      },
+      goalsByDate: {}
+    },
     record: {
       weight: '',
       projects: [],
@@ -55,6 +63,7 @@ Page({
     loadingProjects: true,
     projectsEmpty: false,
     selectedDateRecord: null,
+    selectedDateLocked: false,
     historyRecords: {},
     accessDenied: false,
     deniedReason: ''
@@ -117,6 +126,98 @@ Page({
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
+  },
+
+  getDefaultGoals() {
+    return {
+      calories: 300,
+      health: 2,
+      cultivation: 1
+    };
+  },
+
+  normalizeGoals(goals) {
+    const baseGoals = this.getDefaultGoals();
+    const source = goals && typeof goals === 'object' ? goals : {};
+    const parseGoalValue = (value, fallbackValue) => {
+      const parsedValue = parseInt(value, 10);
+      if (Number.isNaN(parsedValue)) {
+        return fallbackValue;
+      }
+      return Math.max(parsedValue, 0);
+    };
+    return {
+      calories: parseGoalValue(source.calories, baseGoals.calories),
+      health: parseGoalValue(source.health, baseGoals.health),
+      cultivation: parseGoalValue(source.cultivation, baseGoals.cultivation)
+    };
+  },
+
+  normalizeGoalSettings(rawGoalSettings) {
+    const defaultGoals = this.getDefaultGoals();
+    const source = rawGoalSettings && typeof rawGoalSettings === 'object' ? rawGoalSettings : {};
+    const hasStructuredData = !!(source.defaultGoals || source.goalsByDate);
+    const nextDefaultGoals = hasStructuredData
+      ? this.normalizeGoals(source.defaultGoals || defaultGoals)
+      : this.normalizeGoals(source);
+    const sourceGoalsByDate = hasStructuredData && source.goalsByDate && typeof source.goalsByDate === 'object'
+      ? source.goalsByDate
+      : {};
+    const goalsByDate = {};
+
+    Object.keys(sourceGoalsByDate).forEach(date => {
+      goalsByDate[date] = this.normalizeGoals(sourceGoalsByDate[date]);
+    });
+
+    return {
+      defaultGoals: nextDefaultGoals,
+      goalsByDate
+    };
+  },
+
+  resolveGoalsForDate(date, goalSettings = this.data.goalSettings, historyRecords = this.data.historyRecords) {
+    const normalizedGoalSettings = this.normalizeGoalSettings(goalSettings);
+    const dateGoals = date ? normalizedGoalSettings.goalsByDate[date] : null;
+    const record = date ? historyRecords[date] : null;
+    const goalSnapshot = record && record.goalSnapshot ? record.goalSnapshot : null;
+    return this.normalizeGoals(dateGoals || goalSnapshot || normalizedGoalSettings.defaultGoals);
+  },
+
+  freezeHistoricalGoalSnapshots(goalSettings = this.data.goalSettings, historyRecords = this.data.historyRecords) {
+    const goalsByDate = goalSettings && goalSettings.goalsByDate ? goalSettings.goalsByDate : {};
+    const nextHistoryRecords = { ...historyRecords };
+    const changedRecords = [];
+
+    Object.keys(historyRecords || {}).forEach(date => {
+      const record = historyRecords[date];
+      if (!record || !date || date >= this.data.today) {
+        return;
+      }
+      if (record.goalSnapshot || goalsByDate[date]) {
+        return;
+      }
+
+      const frozenGoals = this.resolveGoalsForDate(date, goalSettings, historyRecords);
+      const nextRecord = {
+        ...record,
+        goalSnapshot: frozenGoals
+      };
+      nextHistoryRecords[date] = nextRecord;
+      changedRecords.push(nextRecord);
+    });
+
+    return {
+      historyRecords: changedRecords.length ? nextHistoryRecords : historyRecords,
+      changedRecords
+    };
+  },
+
+  async syncGoalSnapshots(records) {
+    if (!wx.cloud || !records || !records.length) {
+      return;
+    }
+
+    await Promise.all(records.map(record => saveCheckinRecordToCloud(record)));
   },
 
   async loadProjects() {
@@ -183,15 +284,15 @@ Page({
   },
 
   async loadData() {
-    let goals = wx.getStorageSync(LOCAL_KEYS.CHECKIN_GOALS) || this.data.goals;
+    let goalSettings = this.normalizeGoalSettings(wx.getStorageSync(LOCAL_KEYS.CHECKIN_GOALS) || this.data.goalSettings);
     let historyRecords = wx.getStorageSync(LOCAL_KEYS.CHECKIN_HISTORY) || {};
 
     if (wx.cloud) {
       try {
         const cloudGoals = await loadCheckinGoalsFromCloud();
         if (cloudGoals) {
-          goals = { ...goals, ...cloudGoals };
-          wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, goals);
+          goalSettings = this.normalizeGoalSettings(cloudGoals);
+          wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, goalSettings);
         }
       } catch (error) {
         console.error('从云端加载打卡目标失败：', error);
@@ -203,9 +304,21 @@ Page({
         console.error('从云端加载打卡记录失败：', error);
       }
     }
+
+    const frozenResult = this.freezeHistoricalGoalSnapshots(goalSettings, historyRecords);
+    historyRecords = frozenResult.historyRecords;
+    if (frozenResult.changedRecords.length) {
+      wx.setStorageSync(LOCAL_KEYS.CHECKIN_HISTORY, historyRecords);
+      try {
+        await this.syncGoalSnapshots(frozenResult.changedRecords);
+      } catch (error) {
+        console.error('同步历史目标快照失败：', error);
+      }
+    }
     
     this.setData({
-      goals,
+      goalSettings,
+      goals: this.resolveGoalsForDate(this.data.selectedDate, goalSettings, historyRecords),
       historyRecords
     });
 
@@ -240,7 +353,17 @@ Page({
     }
 
     try {
-      const historyRecords = await this.syncMonthRecords(this.data.historyRecords);
+      let historyRecords = await this.syncMonthRecords(this.data.historyRecords);
+      const frozenResult = this.freezeHistoricalGoalSnapshots(this.data.goalSettings, historyRecords);
+      historyRecords = frozenResult.historyRecords;
+      if (frozenResult.changedRecords.length) {
+        wx.setStorageSync(LOCAL_KEYS.CHECKIN_HISTORY, historyRecords);
+        try {
+          await this.syncGoalSnapshots(frozenResult.changedRecords);
+        } catch (error) {
+          console.error('刷新后同步历史目标快照失败：', error);
+        }
+      }
       this.setData({ historyRecords }, () => {
         this.generateCalendar();
         this.loadRecordForDate(this.data.selectedDate);
@@ -253,8 +376,10 @@ Page({
   },
 
   loadRecordForDate(date) {
-    const { historyRecords, allProjects } = this.data;
+    const { historyRecords, allProjects, today, goalSettings } = this.data;
     const record = historyRecords[date] || null;
+    const selectedDateLocked = !!date && date < today && !record;
+    const goals = this.resolveGoalsForDate(date, goalSettings, historyRecords);
 
     if (record) {
       const updatedProjects = allProjects.map(p => ({
@@ -266,7 +391,9 @@ Page({
         'record.projects': record.projectIds || [],
         'record.durations': record.durations || {},
         allProjects: updatedProjects,
-        selectedDateRecord: record
+        goals,
+        selectedDateRecord: record,
+        selectedDateLocked
       });
     } else {
       const resetProjects = allProjects.map(p => ({ ...p, checked: false }));
@@ -275,13 +402,15 @@ Page({
         'record.projects': [],
         'record.durations': {},
         allProjects: resetProjects,
-        selectedDateRecord: null
+        goals,
+        selectedDateRecord: null,
+        selectedDateLocked
       });
     }
   },
 
   generateCalendar() {
-    const { currentYear, currentMonth, historyRecords } = this.data;
+    const { currentYear, currentMonth, historyRecords, today, selectedDate } = this.data;
     const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
     
@@ -294,12 +423,15 @@ Page({
     for (let i = 1; i <= daysInMonth; i++) {
       const dateStr = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
       const hasRecord = !!historyRecords[dateStr];
+      const isFuture = !!today && dateStr > today;
       calendarDays.push({
         day: i,
         date: dateStr,
         status: hasRecord ? 'checked' : 'normal',
         hasRecord: hasRecord,
-        isToday: dateStr === this.data.today
+        isToday: dateStr === today,
+        isFuture,
+        isSelected: dateStr === selectedDate
       });
     }
     
@@ -321,6 +453,15 @@ Page({
 
   nextMonth() {
     let { currentYear, currentMonth } = this.data;
+    const [todayYear, todayMonth] = (this.data.today || '').split('-').map(item => parseInt(item, 10));
+    if (
+      todayYear &&
+      todayMonth &&
+      (currentYear > todayYear || (currentYear === todayYear && currentMonth >= todayMonth))
+    ) {
+      wx.showToast({ title: '不可查看未来月份', icon: 'none' });
+      return;
+    }
     if (currentMonth === 12) {
       currentYear++;
       currentMonth = 1;
@@ -341,7 +482,40 @@ Page({
   },
 
   async saveGoals() {
-    wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, this.data.goals);
+    const { selectedDate, today, goalSettings, historyRecords, selectedDateRecord } = this.data;
+    const normalizedGoals = this.normalizeGoals(this.data.goals);
+    const frozenResult = this.freezeHistoricalGoalSnapshots(goalSettings, historyRecords);
+    const baseHistoryRecords = frozenResult.historyRecords;
+    const nextGoalSettings = this.normalizeGoalSettings({
+      defaultGoals: selectedDate === today ? normalizedGoals : goalSettings.defaultGoals,
+      goalsByDate: {
+        ...(goalSettings.goalsByDate || {}),
+        [selectedDate]: normalizedGoals
+      }
+    });
+    let updatedRecord = null;
+    let nextHistoryRecords = baseHistoryRecords;
+
+    wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, nextGoalSettings);
+
+    if (selectedDateRecord) {
+      updatedRecord = {
+        ...selectedDateRecord,
+        goalSnapshot: normalizedGoals
+      };
+      nextHistoryRecords = {
+        ...baseHistoryRecords,
+        [selectedDate]: updatedRecord
+      };
+    }
+    wx.setStorageSync(LOCAL_KEYS.CHECKIN_HISTORY, nextHistoryRecords);
+
+    this.setData({
+      goalSettings: nextGoalSettings,
+      goals: normalizedGoals,
+      historyRecords: nextHistoryRecords,
+      selectedDateRecord: updatedRecord || selectedDateRecord
+    });
 
     if (!wx.cloud) {
       wx.showToast({ title: '目标已保存', icon: 'success' });
@@ -349,7 +523,11 @@ Page({
     }
 
     try {
-      await saveCheckinGoalsToCloud(this.data.goals);
+      await this.syncGoalSnapshots(frozenResult.changedRecords);
+      await saveCheckinGoalsToCloud(nextGoalSettings);
+      if (updatedRecord) {
+        await saveCheckinRecordToCloud(updatedRecord);
+      }
       wx.showToast({ title: '目标已同步', icon: 'success' });
     } catch (error) {
       console.error('保存打卡目标失败：', error);
@@ -382,10 +560,20 @@ Page({
   },
 
   async submitRecord() {
-    const { record, allProjects, historyRecords, selectedDate } = this.data;
+    const { record, allProjects, historyRecords, selectedDate, today, selectedDateRecord, goalSettings } = this.data;
 
     if (!allProjects.length) {
       wx.showToast({ title: '暂无可打卡项目', icon: 'none' });
+      return;
+    }
+
+    if (selectedDate > today) {
+      wx.showToast({ title: '未来日期不可打卡', icon: 'none' });
+      return;
+    }
+
+    if (selectedDate < today && !selectedDateRecord) {
+      wx.showToast({ title: '过去未打卡日期不可补录', icon: 'none' });
       return;
     }
 
@@ -421,6 +609,16 @@ Page({
     calories = Math.round(calories * 10) / 10;
     health = Math.round(health * 10) / 10;
     cultivation = Math.round(cultivation * 10) / 10;
+    const frozenResult = this.freezeHistoricalGoalSnapshots(goalSettings, historyRecords);
+    const baseHistoryRecords = frozenResult.historyRecords;
+    const effectiveGoals = this.normalizeGoals(this.data.goals);
+    const nextGoalSettings = this.normalizeGoalSettings({
+      defaultGoals: selectedDate === today ? effectiveGoals : goalSettings.defaultGoals,
+      goalsByDate: {
+        ...(goalSettings.goalsByDate || {}),
+        [selectedDate]: effectiveGoals
+      }
+    });
 
     const newRecord = {
       date: selectedDate,
@@ -429,14 +627,18 @@ Page({
       durations: record.durations,
       calories,
       health,
-      cultivation
+      cultivation,
+      goalSnapshot: effectiveGoals
     };
 
-    const newHistory = { ...historyRecords, [selectedDate]: newRecord };
+    const newHistory = { ...baseHistoryRecords, [selectedDate]: newRecord };
     wx.setStorageSync(LOCAL_KEYS.CHECKIN_HISTORY, newHistory);
+    wx.setStorageSync(LOCAL_KEYS.CHECKIN_GOALS, nextGoalSettings);
     
     this.setData({
       historyRecords: newHistory,
+      goalSettings: nextGoalSettings,
+      goals: effectiveGoals,
       selectedDateRecord: newRecord
     });
 
@@ -445,7 +647,10 @@ Page({
     let syncSuccess = !wx.cloud;
     if (wx.cloud) {
       try {
-        syncSuccess = await saveCheckinRecordToCloud(newRecord);
+        await this.syncGoalSnapshots(frozenResult.changedRecords);
+        await saveCheckinRecordToCloud(newRecord);
+        await saveCheckinGoalsToCloud(nextGoalSettings);
+        syncSuccess = true;
       } catch (error) {
         console.error('保存到云端失败：', error);
       }
@@ -460,7 +665,12 @@ Page({
   selectDate(e) {
     const { date } = e.currentTarget.dataset;
     if (!date) return;
+    if (date > this.data.today) {
+      wx.showToast({ title: '未来日期不可选择', icon: 'none' });
+      return;
+    }
     this.setData({ selectedDate: date }, () => {
+      this.generateCalendar();
       this.loadRecordForDate(date);
     });
   },

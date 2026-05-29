@@ -393,17 +393,40 @@ async function loadCheckinRecordsFromCloud(options = {}) {
   return res.data || [];
 }
 
+function sanitizeCheckinRecordPayload(record) {
+  const source = record && typeof record === 'object' ? record : {};
+  const normalizedGoals = source.goalSnapshot && typeof source.goalSnapshot === 'object'
+    ? {
+        calories: parseInt(source.goalSnapshot.calories, 10) || 0,
+        health: parseInt(source.goalSnapshot.health, 10) || 0,
+        cultivation: parseInt(source.goalSnapshot.cultivation, 10) || 0
+      }
+    : undefined;
+
+  return {
+    date: source.date || '',
+    weight: typeof source.weight === 'number' ? source.weight : (parseFloat(source.weight) || 0),
+    projectIds: Array.isArray(source.projectIds) ? source.projectIds : [],
+    durations: source.durations && typeof source.durations === 'object' ? source.durations : {},
+    calories: typeof source.calories === 'number' ? source.calories : (parseFloat(source.calories) || 0),
+    health: typeof source.health === 'number' ? source.health : (parseFloat(source.health) || 0),
+    cultivation: typeof source.cultivation === 'number' ? source.cultivation : (parseFloat(source.cultivation) || 0),
+    ...(normalizedGoals ? { goalSnapshot: normalizedGoals } : {})
+  };
+}
+
 async function saveCheckinRecordToCloud(record) {
   const db = getDb();
   if (!db) return false;
 
   const openid = await getCurrentOpenId();
   if (!openid) return false;
+  const payload = sanitizeCheckinRecordPayload(record);
 
   const existed = await db.collection(COLLECTIONS.CHECKIN_RECORDS)
     .where({
       openid,
-      date: record.date
+      date: payload.date
     })
     .limit(1)
     .get();
@@ -411,7 +434,7 @@ async function saveCheckinRecordToCloud(record) {
   if (existed.data && existed.data.length) {
     await db.collection(COLLECTIONS.CHECKIN_RECORDS).doc(existed.data[0]._id).update({
       data: {
-        ...record,
+        ...payload,
         openid,
         updateTime: db.serverDate()
       }
@@ -421,7 +444,7 @@ async function saveCheckinRecordToCloud(record) {
 
   await db.collection(COLLECTIONS.CHECKIN_RECORDS).add({
     data: {
-      ...record,
+      ...payload,
       openid,
       createTime: db.serverDate(),
       updateTime: db.serverDate()
