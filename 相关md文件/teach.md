@@ -23,7 +23,6 @@
 - `utils/dataSync.js`：大部分用户数据同步逻辑。
 - `utils/access.js`：隐私选择与访问控制逻辑。
 - `cloudfunctions/login/index.js`：登录云函数。
-- `cloudfunctions/aiChat/index.js`：AI 云函数。
 
 ## 4. 首次联调建议顺序
 
@@ -40,7 +39,6 @@
 至少部署：
 
 - `login`
-- `aiChat`
 - `migrateLegacyData`
 
 部署方式：
@@ -49,13 +47,7 @@
 2. 右键具体云函数目录。
 3. 选择“上传并部署：云端安装依赖”。
 
-### 4.3 检查 AI 环境变量
-
-进入云函数详情，确认：
-
-- `DEEPSEEK_API_KEY` 已配置
-
-### 4.4 检查数据库集合
+### 4.3 检查数据库集合
 
 至少确认以下集合存在：
 
@@ -63,7 +55,6 @@
 - `user_settings`
 - `checkin_records`
 - `content_favorites`
-- `ai_favorites`
 - `campaign_contents`
 - `heritage_contents`
 - `user_feedback`
@@ -90,11 +81,6 @@
 - 读写 `checkin_records`
 - 读写 `user_settings`
 
-### AI 页
-
-- 调用 `aiChat`
-- 读写 `ai_favorites`
-
 ### 个人中心
 
 - 调用 `login`
@@ -115,16 +101,7 @@
 - 当前环境是否正确
 - 内容 `status` 是否开启
 
-### 6.2 AI 不返回
-
-优先检查：
-
-- `aiChat` 是否已部署
-- `DEEPSEEK_API_KEY` 是否存在
-- 云函数日志是否报错
-- 网络是否正常
-
-### 6.3 登录失败
+### 6.2 登录失败
 
 优先检查：
 
@@ -132,7 +109,7 @@
 - 当前微信号是否可调用云函数
 - `users` 集合权限是否合理
 
-### 6.4 打卡没有项目
+### 6.3 打卡没有项目
 
 优先检查：
 
@@ -144,7 +121,7 @@
 
 1. 先读 `README.md`
 2. 再读 `真机验证清单.md`
-3. 然后部署云函数并检查环境变量
+3. 然后部署云函数
 4. 再查看数据库集合和权限
 5. 最后用真机逐页走流程
 
@@ -152,7 +129,6 @@
 
 - 代码质量是否重新扫描
 - 协议与页面是否一致
-- AI 问答是否有越界回答
 - 真机是否完整通过
 - 截图、名称、简介是否与当前程序一致
 
@@ -162,6 +138,3 @@
 - `function.md`：项目现状与上线收口
 - `真机验证清单.md`：手动验收清单
 - `legacy-data-migration.md`：旧数据迁移说明
-- `用户协议.md`：用户协议
-- `隐私政策.md`：隐私政策
-- `AI使用说明.md`：AI 使用说明

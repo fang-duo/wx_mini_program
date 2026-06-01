@@ -8,7 +8,6 @@ const DEFAULT_COLLECTIONS = [
   'users',
   'user_settings',
   'checkin_records',
-  'ai_favorites',
   'content_favorites'
 ];
 
@@ -52,12 +51,6 @@ function sortDocsByRank(docs) {
 
 function extractOpenId(doc) {
   return doc.openid || doc._openid || '';
-}
-
-function buildAiFavoriteKey(doc) {
-  const question = String(doc.question || '').trim();
-  const answer = String(doc.answer || '').trim();
-  return `${question}::${answer}`;
 }
 
 function buildContentFavoriteKey(doc) {
@@ -263,51 +256,6 @@ function analyzeCheckinRecords(docs) {
   };
 }
 
-function analyzeAiFavorites(docs) {
-  const operations = [];
-  const warnings = [];
-  const groups = {};
-
-  docs.forEach(doc => {
-    const openid = extractOpenId(doc);
-    const favoriteKey = doc.favoriteKey || buildAiFavoriteKey(doc);
-    if (!openid || !favoriteKey || favoriteKey === '::') {
-      warnings.push(`ai_favorites:${doc._id} 缺少 openid 或 favoriteKey，已跳过`);
-      return;
-    }
-
-    const groupKey = `${openid}::${favoriteKey}`;
-    if (!groups[groupKey]) groups[groupKey] = [];
-    groups[groupKey].push(doc);
-
-    const updateData = {};
-    if (!doc.openid && doc._openid) {
-      updateData.openid = doc._openid;
-    }
-    if (!doc.favoriteKey) {
-      updateData.favoriteKey = favoriteKey;
-    }
-    pushUpdate(operations, 'ai_favorites', doc._id, updateData, '回填 AI 收藏字段');
-  });
-
-  Object.keys(groups).forEach(groupKey => {
-    const items = sortDocsByRank(groups[groupKey]);
-    if (items.length <= 1) return;
-
-    const primary = items[0];
-    items.slice(1).forEach(item => {
-      pushRemove(operations, 'ai_favorites', item._id, `删除重复 AI 收藏，保留 ${primary._id}`);
-    });
-  });
-
-  return {
-    collection: 'ai_favorites',
-    totalDocs: docs.length,
-    warnings,
-    operations
-  };
-}
-
 function analyzeContentFavorites(docs) {
   const operations = [];
   const warnings = [];
@@ -361,8 +309,6 @@ function analyzeCollection(collectionName, docs) {
       return analyzeUserSettings(docs);
     case 'checkin_records':
       return analyzeCheckinRecords(docs);
-    case 'ai_favorites':
-      return analyzeAiFavorites(docs);
     case 'content_favorites':
       return analyzeContentFavorites(docs);
     default:

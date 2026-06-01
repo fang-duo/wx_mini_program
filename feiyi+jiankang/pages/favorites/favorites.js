@@ -4,9 +4,10 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary,
-  ensurePrivacyHomeLock
+  getAccessSummary
 } = require('../../utils/access');
+
+const LOGIN_REDIRECT_KEY = 'post_login_redirect';
 
 Page({
   data: {
@@ -17,18 +18,7 @@ Page({
   },
 
   async onShow() {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
-
-    const { privacyState, isLoggedIn } = getAccessSummary();
-    if (privacyState.browseOnly || !privacyState.accepted) {
-      this.setData({
-        accessDenied: true,
-        deniedReason: '同意隐私政策后可查看和同步首页收藏。'
-      });
-      return;
-    }
+    const { isLoggedIn } = getAccessSummary();
 
     if (!isLoggedIn) {
       this.setData({
@@ -84,6 +74,10 @@ Page({
   },
 
   goToProfile() {
+    wx.setStorageSync(LOGIN_REDIRECT_KEY, {
+      mode: 'navigateTo',
+      url: '/pages/favorites/favorites'
+    });
     wx.switchTab({
       url: '/pages/profile/profile'
     });

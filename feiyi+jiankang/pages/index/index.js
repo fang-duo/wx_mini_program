@@ -26,8 +26,6 @@ function getTimeValue(value) {
 }
 
 const {
-  getPrivacyState,
-  setPrivacyState,
   syncGlobalAccessState
 } = require('../../utils/access');
 
@@ -68,9 +66,7 @@ Page({
     categories: [],
     articles: [],
     dailyRecommend: null,
-    loadingHomeContent: true,
-    showPrivacyDialog: false,
-    isBrowseOnly: false
+    loadingHomeContent: true
   },
 
   onLoad() {
@@ -212,63 +208,6 @@ Page({
   },
 
   refreshAccessState() {
-    const { privacyState } = syncGlobalAccessState();
-    this.setData({
-      showPrivacyDialog: !privacyState.hasResponded,
-      isBrowseOnly: privacyState.browseOnly
-    });
-  },
-
-  acceptPrivacy() {
-    setPrivacyState({
-      hasResponded: true,
-      accepted: true,
-      browseOnly: false
-    });
-
-    this.setData({
-      showPrivacyDialog: false,
-      isBrowseOnly: false
-    });
-
-    wx.showToast({
-      title: '已开启完整功能',
-      icon: 'success'
-    });
-  },
-
-  declinePrivacy() {
-    setPrivacyState({
-      hasResponded: true,
-      accepted: false,
-      browseOnly: true
-    });
-
-    this.setData({
-      showPrivacyDialog: false,
-      isBrowseOnly: true
-    });
-
-    wx.showToast({
-      title: '当前为仅浏览模式',
-      icon: 'none'
-    });
-  },
-
-  enableFullFeatures() {
-    wx.showModal({
-      title: '开启完整功能',
-      content: '确认已阅读《隐私政策》，并同意开启 AI、打卡、登录和收藏等完整功能吗？',
-      success: res => {
-        if (!res.confirm) return;
-        this.acceptPrivacy();
-      }
-    });
-  },
-
-  openAgreement() {
-    wx.navigateTo({
-      url: '/pages/agreement/agreement?type=privacy'
-    });
+    syncGlobalAccessState();
   }
 })

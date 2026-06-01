@@ -1,14 +1,13 @@
 const { LOCAL_KEYS } = require('./dataSync');
 
 const PRIVACY_STATE_KEY = 'privacy_state';
-const PRIVACY_VERSION = '2026-05-26';
-let lastPrivacyToastTime = 0;
+const PRIVACY_VERSION = '2026-06-01';
 
 function getDefaultPrivacyState() {
   return {
     version: PRIVACY_VERSION,
-    hasResponded: false,
-    accepted: false,
+    hasResponded: true,
+    accepted: true,
     browseOnly: false
   };
 }
@@ -61,11 +60,9 @@ function isValidLoggedInUser(userInfo) {
   return !!(
     userInfo &&
     typeof userInfo === 'object' &&
-    (
-      userInfo.loggedIn ||
-      userInfo.openid ||
-      userInfo.nickname
-    )
+    userInfo.loggedIn === true &&
+    typeof userInfo.openid === 'string' &&
+    !!userInfo.openid.trim()
   );
 }
 
@@ -73,7 +70,7 @@ function isLoggedIn() {
   const app = typeof getApp === 'function' ? getApp() : null;
   const appUserInfo = app && app.globalData ? app.globalData.userInfo : null;
 
-  if (app && app.globalData && app.globalData.isLoggedIn) {
+  if (app && app.globalData && app.globalData.isLoggedIn && isValidLoggedInUser(appUserInfo)) {
     return true;
   }
 
@@ -86,7 +83,8 @@ function isLoggedIn() {
 
 function syncGlobalAccessState() {
   const app = typeof getApp === 'function' ? getApp() : null;
-  const privacyState = getPrivacyState();
+  const privacyState = getDefaultPrivacyState();
+  wx.setStorageSync(PRIVACY_STATE_KEY, privacyState);
   const cachedUserInfo = getCachedUserInfo();
   const loggedIn = isValidLoggedInUser(cachedUserInfo);
   const userInfo = loggedIn
@@ -106,8 +104,8 @@ function syncGlobalAccessState() {
   if (app && app.globalData) {
     app.globalData.isLoggedIn = loggedIn;
     app.globalData.userInfo = userInfo;
-    app.globalData.privacyAccepted = privacyState.hasResponded && privacyState.accepted && !privacyState.browseOnly;
-    app.globalData.isBrowseOnly = privacyState.browseOnly;
+    app.globalData.privacyAccepted = true;
+    app.globalData.isBrowseOnly = false;
   }
 
   return {
@@ -130,42 +128,7 @@ function getAccessSummary() {
 }
 
 function ensurePrivacyHomeLock(page, options = {}) {
-  const privacyState = getPrivacyState();
-  if (privacyState.hasResponded) {
-    return false;
-  }
-
-  const route = options.route || (page && page.route) || '';
-  const allowAgreement = !!options.allowAgreement;
-  const showToast = options.showToast !== false;
-
-  if (route === 'pages/index/index') {
-    return false;
-  }
-
-  if (allowAgreement && route === 'pages/agreement/agreement') {
-    return false;
-  }
-
-  if (showToast) {
-    const now = Date.now();
-    if (now - lastPrivacyToastTime > 1200) {
-      lastPrivacyToastTime = now;
-      wx.showToast({
-        title: '请先在首页选择是否同意隐私政策',
-        icon: 'none',
-        duration: 1800
-      });
-    }
-  }
-
-  setTimeout(() => {
-    wx.switchTab({
-      url: '/pages/index/index'
-    });
-  }, 0);
-
-  return true;
+  return false;
 }
 
 module.exports = {

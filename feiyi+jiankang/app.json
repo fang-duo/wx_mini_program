@@ -1,16 +1,13 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/agreement/agreement",
     "pages/checkin/checkin",
-    "pages/ai/ai",
     "pages/profile/profile",
     "pages/video-play/video-play",
     "pages/category/category",
     "pages/detail/detail",
     "pages/account/account",
     "pages/favorites/favorites",
-    "pages/message/message",
     "pages/feedback/feedback",
     "pages/settings/settings"
   ],
@@ -37,12 +34,6 @@
         "text": "健康打卡",
         "iconPath": "images/calendar.png",
         "selectedIconPath": "images/calendar.png"
-      },
-      {
-        "pagePath": "pages/ai/ai",
-        "text": "AI问答",
-        "iconPath": "images/ai.png",
-        "selectedIconPath": "images/ai-active.png"
       },
       {
         "pagePath": "pages/profile/profile",

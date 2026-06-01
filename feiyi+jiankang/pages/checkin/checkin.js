@@ -7,9 +7,10 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary,
-  ensurePrivacyHomeLock
+  getAccessSummary
 } = require('../../utils/access');
+
+const LOGIN_REDIRECT_KEY = 'post_login_redirect';
 
 const CHECKIN_CATEGORY_RULES = {
   sports: { categoryName: '传统体育', value: 3.5, unit: 'kcal/min', inputUnit: '分钟' },
@@ -70,30 +71,18 @@ Page({
   },
 
   onLoad() {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
     this.refreshAccessState(true);
   },
 
   onShow() {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
     this.refreshAccessState(false);
   },
 
-  onTabItemTap() {
-    ensurePrivacyHomeLock(this, { allowAgreement: true, showToast: true });
-  },
-
   async refreshAccessState(isFirstLoad) {
-    const { privacyState, isLoggedIn } = getAccessSummary();
+    const { isLoggedIn } = getAccessSummary();
     let deniedReason = '';
 
-    if (privacyState.browseOnly || !privacyState.accepted) {
-      deniedReason = '同意隐私政策后可使用健康打卡。';
-    } else if (!isLoggedIn) {
+    if (!isLoggedIn) {
       deniedReason = '登录后可记录和同步健康打卡。';
     }
 
@@ -676,6 +665,10 @@ Page({
   },
 
   goToProfile() {
+    wx.setStorageSync(LOGIN_REDIRECT_KEY, {
+      mode: 'switchTab',
+      url: '/pages/checkin/checkin'
+    });
     wx.switchTab({
       url: '/pages/profile/profile'
     });

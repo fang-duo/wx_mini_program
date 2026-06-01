@@ -6,10 +6,10 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary,
-  setPrivacyState,
-  ensurePrivacyHomeLock
+  getAccessSummary
 } = require('../../utils/access');
+
+const LOGIN_REDIRECT_KEY = 'post_login_redirect';
 
 Page({
   data: {
@@ -18,40 +18,26 @@ Page({
       avatarUrl: ''
     },
     isLoggedIn: false,
-    isBrowseOnly: false,
     showLoginSheet: false,
-    loginLoading: false,
-    agreedUserAgreement: false,
-    agreedAiStatement: false
+    loginLoading: false
   },
 
   async onShow() {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
     await this.refreshPageState();
   },
 
-  onTabItemTap() {
-    ensurePrivacyHomeLock(this, { allowAgreement: true, showToast: true });
-  },
-
   async refreshPageState() {
-    const { privacyState, isLoggedIn } = getAccessSummary();
+    const { isLoggedIn } = getAccessSummary();
     const app = getApp();
     const localUserInfo = wx.getStorageSync(LOCAL_KEYS.USER_INFO);
-    const canUseAccountFeatures = privacyState.accepted && !privacyState.browseOnly;
 
     this.setData({
-      isBrowseOnly: privacyState.browseOnly,
-      isLoggedIn: canUseAccountFeatures && isLoggedIn,
+      isLoggedIn,
       showLoginSheet: false,
-      loginLoading: false,
-      agreedUserAgreement: false,
-      agreedAiStatement: false
+      loginLoading: false
     });
 
-    if (!canUseAccountFeatures) {
+    if (!isLoggedIn) {
       this.setData({
         userInfo: {
           nickname: '',
@@ -61,7 +47,7 @@ Page({
       return;
     }
 
-    if (localUserInfo && isLoggedIn) {
+    if (localUserInfo) {
       this.setData({ userInfo: { ...localUserInfo } });
       app.globalData.userInfo = { ...localUserInfo };
     }
@@ -85,22 +71,13 @@ Page({
     }
   },
 
-  openAgreement(e) {
-    const type = e.currentTarget.dataset.type || 'privacy';
-    wx.navigateTo({
-      url: `/pages/agreement/agreement?type=${type}`
-    });
-  },
-
   openLoginSheet() {
     this.setData({ showLoginSheet: true });
   },
 
   closeLoginSheet() {
     this.setData({
-      showLoginSheet: false,
-      agreedUserAgreement: false,
-      agreedAiStatement: false
+      showLoginSheet: false
     });
   },
 
@@ -112,25 +89,38 @@ Page({
     });
   },
 
-  toggleAgreement(e) {
-    const field = e.currentTarget.dataset.field;
-    if (!field) return;
+  consumePendingLoginRedirect() {
+    const redirectTarget = wx.getStorageSync(LOGIN_REDIRECT_KEY);
+    wx.removeStorageSync(LOGIN_REDIRECT_KEY);
 
-    this.setData({
-      [field]: !this.data[field]
-    });
+    if (!redirectTarget || typeof redirectTarget !== 'object' || !redirectTarget.url) {
+      return null;
+    }
+
+    return redirectTarget;
+  },
+
+  runPendingLoginRedirect() {
+    const redirectTarget = this.consumePendingLoginRedirect();
+    if (!redirectTarget) {
+      return false;
+    }
+
+    const navigate = redirectTarget.mode === 'switchTab'
+      ? wx.switchTab
+      : wx.navigateTo;
+
+    setTimeout(() => {
+      navigate({
+        url: redirectTarget.url
+      });
+    }, 800);
+
+    return true;
   },
 
   async submitLogin() {
     if (this.data.loginLoading) return;
-
-    if (!this.data.agreedUserAgreement || !this.data.agreedAiStatement) {
-      wx.showToast({
-        title: '请先勾选协议后再登录',
-        icon: 'none'
-      });
-      return;
-    }
 
     this.setData({ loginLoading: true });
     wx.showLoading({ title: '登录中...' });
@@ -161,7 +151,7 @@ Page({
       const userInfo = {
         _id: cloudUserInfo._id || cachedUserInfo._id || '',
         openid: result.openid,
-        nickname: cloudUserInfo.nickname || cachedUserInfo.nickname || '微信用户',
+        nickname: cloudUserInfo.nickname || cachedUserInfo.nickname || '',
         avatarUrl: cloudUserInfo.avatarUrl || cachedUserInfo.avatarUrl || '',
         loggedIn: true
       };
@@ -180,8 +170,10 @@ Page({
 
       await this.refreshPageState();
 
+      const redirected = this.runPendingLoginRedirect();
+
       wx.showToast({
-        title: '登录成功',
+        title: redirected ? '登录成功，正在返回' : '登录成功',
         icon: 'success'
       });
     } catch (error) {
@@ -194,43 +186,22 @@ Page({
       wx.hideLoading();
       this.setData({
         loginLoading: false,
-        showLoginSheet: false,
-        agreedUserAgreement: false,
-        agreedAiStatement: false
+        showLoginSheet: false
       });
     }
   },
 
-  showLoginRequiredDialog(featureName) {
+  showLoginRequiredDialog(featureName, redirectTarget) {
     wx.showModal({
       title: '登录后可用',
       content: `${featureName}需要登录后才可使用，是否现在去登录？`,
       confirmText: '去登录',
       success: res => {
         if (!res.confirm) return;
+        if (redirectTarget && redirectTarget.url) {
+          wx.setStorageSync(LOGIN_REDIRECT_KEY, redirectTarget);
+        }
         this.openLoginSheet();
-      }
-    });
-  },
-
-  enableFullFeatures() {
-    wx.showModal({
-      title: '开启完整功能',
-      content: '确认已阅读《隐私政策》，并同意开启登录、AI、打卡和收藏等完整功能吗？',
-      success: res => {
-        if (!res.confirm) return;
-
-        setPrivacyState({
-          hasResponded: true,
-          accepted: true,
-          browseOnly: false
-        });
-
-        this.refreshPageState();
-        wx.showToast({
-          title: '已开启完整功能',
-          icon: 'success'
-        });
       }
     });
   },
@@ -363,16 +334,11 @@ Page({
   handleMenuClick(e) {
     const title = e.currentTarget.dataset.title;
 
-    if (this.data.isBrowseOnly) {
-      wx.showToast({
-        title: '同意隐私政策后可使用该功能',
-        icon: 'none'
-      });
-      return;
-    }
-
-    if (!this.data.isLoggedIn && ['账号信息管理', '我的收藏内容', 'AI问答收藏'].includes(title)) {
-      this.showLoginRequiredDialog(title);
+    if (!this.data.isLoggedIn && ['账号信息管理', '我的收藏内容'].includes(title)) {
+      const redirectTarget = title === '账号信息管理'
+        ? { mode: 'navigateTo', url: '/pages/account/account' }
+        : { mode: 'navigateTo', url: '/pages/favorites/favorites' };
+      this.showLoginRequiredDialog(title, redirectTarget);
       return;
     }
 
@@ -380,8 +346,6 @@ Page({
       wx.navigateTo({ url: '/pages/account/account' });
     } else if (title === '我的收藏内容') {
       wx.navigateTo({ url: '/pages/favorites/favorites' });
-    } else if (title === 'AI问答收藏') {
-      wx.navigateTo({ url: '/pages/message/message' });
     } else if (title === '帮助与反馈') {
       wx.navigateTo({ url: '/pages/feedback/feedback' });
     } else if (title === '设置') {

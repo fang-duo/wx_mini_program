@@ -1,6 +1,6 @@
 # 遗韵养生微信小程序
 
-“遗韵养生”是一款基于微信小程序原生开发和微信云开发能力实现的非遗养生内容应用。项目当前包含内容浏览、健康打卡、AI 问答、个人资料、收藏、反馈、协议展示等核心模块，适合继续进行真机联调、审核准备与版本维护。
+“遗韵养生”是一款基于微信小程序原生开发和微信云开发能力实现的非遗养生内容应用。项目当前包含内容浏览、健康打卡、个人资料、收藏、反馈、协议展示等核心模块，适合继续进行真机联调、审核准备与版本维护。
 
 ## **快速入门**
 
@@ -23,12 +23,7 @@
 至少确认以下云函数已经上传部署：
 
 - `login`
-- `aiChat`
 - `migrateLegacyData`
-
-其中 `aiChat` 还要确认环境变量：
-
-- `DEEPSEEK_API_KEY`
 
 ### 第四步：检查数据库
 
@@ -38,7 +33,6 @@
 - `user_settings`
 - `checkin_records`
 - `content_favorites`
-- `ai_favorites`
 - `campaign_contents`
 - `heritage_contents`
 - `user_feedback`
@@ -63,11 +57,9 @@
 - 分类页按 `传统体育 / 传统饮食 / 传统医药 / 传统音乐` 展示内容。
 - 详情页支持图文信息、收藏、视频播放入口。
 - 健康打卡支持按日期记录项目、时长、体重与目标，并限制未来日期不可打卡、过去未打卡日期不可补录、过去已打卡日期可修改。
-- AI 问答支持快捷提问、自由提问、问答收藏。
 - 个人中心支持真实微信身份登录、昵称修改、头像上传。
 - 设置页支持通知偏好、本地缓存清理。
 - 反馈页支持提交问题与联系信息。
-- 协议页支持查看《隐私政策》《用户协议》《AI 使用说明》。
 
 ## 2. 技术方案
 
@@ -88,7 +80,6 @@
 ### 2.3 当前云函数
 
 - `login`：获取当前用户 `openid`，并读取用户基础信息。
-- `aiChat`：代理 AI 模型请求，统一做提示词和基础风控。
 - `migrateLegacyData`：用于旧数据补齐与迁移。
 
 ### 2.4 当前云环境
@@ -103,16 +94,13 @@
 ```text
 pages/
 ├── index/        首页
-├── agreement/    协议页
 ├── checkin/      健康打卡
-├── ai/           AI 问答
 ├── profile/      个人中心
 ├── video-play/   视频播放
 ├── category/     分类页
 ├── detail/       详情页
 ├── account/      账号信息
 ├── favorites/    内容收藏
-├── message/      AI 收藏
 ├── feedback/     帮助与反馈
 └── settings/     设置
 ```
@@ -121,7 +109,6 @@ pages/
 
 - 首页
 - 健康打卡
-- AI 问答
 - 个人中心
 
 ## 4. 目录说明
@@ -136,9 +123,6 @@ pages/
 ├── images/                       本地保留图标资源
 ├── README.md                     项目总说明
 ├── 真机验证清单.md               真机检查清单
-├── 用户协议.md                   用户协议文档
-├── 隐私政策.md                   隐私政策文档
-├── AI使用说明.md                 AI 使用说明文档
 ├── function.md                   当前功能现状与上线收口说明
 ├── 功能需求.md                   当前版本功能范围说明
 ├── teach.md                      新手部署与维护指南
@@ -155,7 +139,6 @@ pages/
 - `user_settings`：保存用户设置项和健康打卡目标。
 - `checkin_records`：保存用户每天的打卡记录和统计结果。
 - `content_favorites`：保存用户收藏的内容详情。
-- `ai_favorites`：保存用户收藏的 AI 问答。
 - `campaign_contents`：保存首页活动、宣传内容和轮播候选数据。
 - `heritage_contents`：保存分类、详情、推荐和打卡项目来源内容。
 - `user_feedback`：保存用户在反馈页提交的问题和联系方式。
@@ -183,9 +166,6 @@ pages/
 - `summary`：内容摘要或简要说明。
 - `intro`：详情页使用的正文简介。
 - `cover`：封面图地址。
-- `question`：AI 问答中的提问内容。
-- `answer`：AI 问答中的回答内容。
-- `source`：数据来源标记，例如 AI 问答来源。
 - `category` / `categoryId`：内容所属分类，例如传统体育、传统饮食、传统医药、传统音乐。
 - `section1Title`：详情页第一模块标题。
 - `section1Content`：详情页第一模块内容。
@@ -209,7 +189,6 @@ pages/
 - 分类页：`heritage_contents`
 - 详情页：`campaign_contents`、`heritage_contents`、`content_favorites`
 - 打卡页：`heritage_contents`、`checkin_records`、`user_settings`
-- AI 页：`ai_favorites`
 - 个人中心：`users`
 - 反馈页：`user_feedback`
 
@@ -222,7 +201,6 @@ pages/
 - `favorites`
 - `checkin_goals`
 - `checkin_history`
-- `ai_exit_remind_disabled`
 - `logs`
 - `privacy_state`
 

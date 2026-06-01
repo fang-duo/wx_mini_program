@@ -7,9 +7,10 @@ const {
 } = require('../../utils/dataSync');
 
 const {
-  getAccessSummary,
-  ensurePrivacyHomeLock
+  getAccessSummary
 } = require('../../utils/access');
+
+const LOGIN_REDIRECT_KEY = 'post_login_redirect';
 
 function normalizeMediaValue(value) {
   if (!value) return '';
@@ -36,91 +37,46 @@ async function queryFirstAvailableCollection(db, collectionNames, executor) {
   return null;
 }
 
-function getFallbackArticleData(title) {
-  return {
-    detailId: '',
-    title: title || '内容详情',
-    cover: '',
-    tag: '非遗内容',
-    date: '',
-    intro: '当前内容以云端发布为准，暂无详细介绍。',
-    section1Title: '',
-    section1Content: '',
-    section2Title: '',
-    section2Content: '',
-    hasPractice: false,
-    videoUrl: ''
-  };
-}
-
-function getFallbackCampaignData(title) {
-  return {
-    title: title || '活动详情',
-    cover: '',
-    tag: '活动宣传',
-    date: '',
-    intro: '当前活动详情以云端发布为准，暂无详细介绍。',
-    section1Title: '',
-    section1Content: '',
-    section2Title: '',
-    section2Content: '',
-    hasPractice: false,
-    videoUrl: ''
-  };
-}
-
 Page({
   data: {
     isStarred: false,
-    article: {
-      id: '',
-      contentType: 'heritage',
-      detailId: '',
-      title: '加载中...',
-      cover: '',
-      tag: '',
-      date: '',
-      intro: '',
-      section1Title: '',
-      section1Content: '',
-      section2Title: '',
-      section2Content: '',
-      hasPractice: false,
-      videoUrl: ''
-    }
+    loading: true,
+    loadErrorTitle: '',
+    loadErrorDesc: '',
+    article: null
   },
 
   onLoad(options) {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
     const title = decodeURIComponent(options.title || '内容详情');
     const itemId = decodeURIComponent(options.itemId || '');
     const contentType = decodeURIComponent(options.contentType || 'heritage');
     this.loadArticleData({ title, itemId, contentType });
   },
 
-  onShow() {
-    ensurePrivacyHomeLock(this, { allowAgreement: true });
+  showLoadError(title, desc) {
+    this.setData({
+      loading: false,
+      loadErrorTitle: title,
+      loadErrorDesc: desc,
+      article: null,
+      isStarred: false
+    });
   },
 
   async loadArticleData({ title, itemId, contentType }) {
-    const fallbackData = contentType === 'campaign'
-      ? getFallbackCampaignData(title)
-      : getFallbackArticleData(title);
-
     this.setData({
-      article: {
-        ...fallbackData,
-        id: itemId || '',
-        contentType,
-        detailId: fallbackData.detailId || ''
-      }
+      loading: true,
+      loadErrorTitle: '',
+      loadErrorDesc: '',
+      article: null,
+      isStarred: false
     });
-    this.checkStarStatus();
     wx.setNavigationBarTitle({ title: contentType === 'campaign' ? '活动详情' : '非遗详情' });
 
-    if (!wx.cloud) return;
+    if (!wx.cloud) {
+      this.showLoadError('内容暂不可用', '当前环境暂不支持读取云端内容，请稍后再试。');
+      return;
+    }
 
     const db = wx.cloud.database();
 
@@ -134,40 +90,54 @@ Page({
           try {
             return await collection.doc(itemId).get();
           } catch (error) {
-            // Fallback to title query when the incoming itemId comes from local placeholder data.
+            // Incoming itemId may be stale; fall back to title query.
           }
         }
         return collection.where({ title, status: true }).limit(1).get();
       });
 
       const cloudData = (detailRes.data && (Array.isArray(detailRes.data) ? detailRes.data[0] : detailRes.data)) || null;
-      if (!cloudData) return;
+      if (!cloudData) {
+        this.showLoadError('暂无正式内容', '当前内容尚未在云端发布，请稍后再来查看。');
+        return;
+      }
 
       const article = {
         id: cloudData._id || itemId || '',
         contentType,
-        detailId: cloudData.detailId || fallbackData.detailId || '',
-        title: cloudData.title || fallbackData.title,
-        cover: normalizeMediaValue(cloudData.cover) || fallbackData.cover,
-        tag: cloudData.tag || (contentType === 'campaign' ? '活动宣传' : fallbackData.tag),
-        date: cloudData.date || fallbackData.date,
-        intro: cloudData.intro || cloudData.content || fallbackData.intro,
-        section1Title: cloudData.section1Title || (contentType === 'campaign' ? '活动介绍' : fallbackData.section1Title),
-        section1Content: cloudData.introduction || cloudData.section1Content || fallbackData.section1Content,
-        section2Title: cloudData.section2Title || (contentType === 'campaign' ? '温馨提示' : fallbackData.section2Title),
-        section2Content: cloudData.tips || cloudData.section2Content || fallbackData.section2Content,
-        hasPractice: typeof cloudData.hasPractice === 'boolean' ? cloudData.hasPractice : fallbackData.hasPractice,
-        videoUrl: normalizeMediaValue(cloudData.videoUrl) || fallbackData.videoUrl
+        detailId: cloudData.detailId || '',
+        title: cloudData.title || title || (contentType === 'campaign' ? '活动详情' : '非遗详情'),
+        cover: normalizeMediaValue(cloudData.cover),
+        tag: cloudData.tag || (contentType === 'campaign' ? '活动宣传' : '非遗内容'),
+        date: cloudData.date || '',
+        intro: cloudData.intro || cloudData.content || '',
+        section1Title: cloudData.section1Title || (contentType === 'campaign' ? '活动介绍' : ''),
+        section1Content: cloudData.introduction || cloudData.section1Content || '',
+        section2Title: cloudData.section2Title || (contentType === 'campaign' ? '温馨提示' : ''),
+        section2Content: cloudData.tips || cloudData.section2Content || '',
+        hasPractice: typeof cloudData.hasPractice === 'boolean' ? cloudData.hasPractice : false,
+        videoUrl: normalizeMediaValue(cloudData.videoUrl)
       };
 
-      this.setData({ article });
+      this.setData({
+        article,
+        loading: false,
+        loadErrorTitle: '',
+        loadErrorDesc: ''
+      });
       this.checkStarStatus();
     } catch (error) {
       console.error('详情页云端内容加载失败：', error);
+      this.showLoadError('内容加载失败', '正式内容读取失败，请稍后重试。');
     }
   },
 
   async checkStarStatus() {
+    if (!this.data.article) {
+      this.setData({ isStarred: false });
+      return;
+    }
+
     const currentKey = this.getFavoriteKey(this.data.article);
     if (!currentKey) {
       this.setData({ isStarred: false });
@@ -189,19 +159,12 @@ Page({
   },
 
   getFavoriteKey(item) {
+    if (!item) return '';
     return buildFavoriteKey(item);
   },
 
   async toggleStar() {
-    const { privacyState, isLoggedIn } = getAccessSummary();
-    if (privacyState.browseOnly || !privacyState.accepted) {
-      wx.showToast({
-        title: '仅完整功能模式下可收藏',
-        icon: 'none'
-      });
-      return;
-    }
-
+    const { isLoggedIn } = getAccessSummary();
     if (!isLoggedIn) {
       wx.showModal({
         title: '登录后可收藏',
@@ -209,6 +172,18 @@ Page({
         confirmText: '去登录',
         success: res => {
           if (!res.confirm) return;
+          const currentArticle = this.data.article || {};
+          const redirectQuery = [
+            `title=${encodeURIComponent(currentArticle.title || '')}`,
+            `contentType=${encodeURIComponent(currentArticle.contentType || 'heritage')}`
+          ];
+          if (currentArticle.id) {
+            redirectQuery.push(`itemId=${encodeURIComponent(currentArticle.id)}`);
+          }
+          wx.setStorageSync(LOGIN_REDIRECT_KEY, {
+            mode: 'navigateTo',
+            url: `/pages/detail/detail?${redirectQuery.join('&')}`
+          });
           wx.switchTab({
             url: '/pages/profile/profile'
           });
@@ -249,6 +224,7 @@ Page({
   },
 
   goToVideo() {
+    if (!this.data.article) return;
     const finalUrl = this.data.article.videoUrl;
 
     if (!finalUrl) {
@@ -268,12 +244,6 @@ Page({
     wx.showToast({
       title: '当前内容暂不支持打卡',
       icon: 'none'
-    });
-  },
-
-  askAI() {
-    wx.switchTab({
-      url: '/pages/ai/ai'
     });
   }
 })

@@ -4,7 +4,6 @@ const LOCAL_KEYS = {
   CONTENT_FAVORITES: 'favorites',
   CHECKIN_GOALS: 'checkin_goals',
   CHECKIN_HISTORY: 'checkin_history',
-  EXIT_REMIND_DISABLED: 'ai_exit_remind_disabled',
   LOGS: 'logs'
 };
 
@@ -12,8 +11,7 @@ const COLLECTIONS = {
   USERS: 'users',
   USER_SETTINGS: 'user_settings',
   CONTENT_FAVORITES: 'content_favorites',
-  CHECKIN_RECORDS: 'checkin_records',
-  AI_FAVORITES: 'ai_favorites'
+  CHECKIN_RECORDS: 'checkin_records'
 };
 
 const DEFAULT_APP_PREFERENCES = {
@@ -360,10 +358,6 @@ async function saveCheckinGoalsToCloud(goals) {
   });
 }
 
-function buildAiFavoriteKey(question, answer) {
-  return `${String(question || '').trim()}::${String(answer || '').trim()}`;
-}
-
 function getMonthDateRange(year, month) {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
   const endDate = `${year}-${String(month).padStart(2, '0')}-${String(new Date(year, month, 0).getDate()).padStart(2, '0')}`;
@@ -453,96 +447,12 @@ async function saveCheckinRecordToCloud(record) {
   return true;
 }
 
-async function loadAiFavoritesFromCloud() {
-  const db = getDb();
-  if (!db) return [];
-
-  const openid = await getCurrentOpenId();
-  if (!openid) return [];
-
-  const res = await db.collection(COLLECTIONS.AI_FAVORITES)
-    .where({ openid })
-    .orderBy('createTime', 'desc')
-    .get();
-
-  return (res.data || []).map(item => ({
-    ...item,
-    favoriteKey: item.favoriteKey || buildAiFavoriteKey(item.question, item.answer)
-  }));
-}
-
-async function saveAiFavoritesToCloud(pairs) {
-  const db = getDb();
-  if (!db) return [];
-
-  const openid = await getCurrentOpenId();
-  if (!openid) return [];
-
-  const results = await Promise.all((pairs || []).map(async item => {
-    const favoriteKey = buildAiFavoriteKey(item.question, item.answer);
-    const existed = await db.collection(COLLECTIONS.AI_FAVORITES)
-      .where({ openid, favoriteKey })
-      .limit(1)
-      .get();
-
-    if (existed.data && existed.data.length) {
-      return {
-        _id: existed.data[0]._id,
-        favoriteKey,
-        duplicated: true
-      };
-    }
-
-    const addRes = await db.collection(COLLECTIONS.AI_FAVORITES).add({
-      data: {
-        openid,
-        favoriteKey,
-        question: item.question,
-        answer: item.answer,
-        source: 'ai_chat',
-        createTime: db.serverDate()
-      }
-    });
-
-    return {
-      _id: addRes._id,
-      favoriteKey,
-      duplicated: false
-    };
-  }));
-
-  return results;
-}
-
-async function removeAiFavoritesByIds(ids) {
-  const db = getDb();
-  if (!db || !Array.isArray(ids) || !ids.length) return 0;
-
-  const openid = await getCurrentOpenId();
-  if (!openid) return 0;
-
-  const _ = db.command;
-  const res = await db.collection(COLLECTIONS.AI_FAVORITES)
-    .where({
-      openid,
-      _id: _.in(ids)
-    })
-    .get();
-
-  const removableItems = res.data || [];
-  await Promise.all(
-    removableItems.map(item => db.collection(COLLECTIONS.AI_FAVORITES).doc(item._id).remove())
-  );
-  return removableItems.length;
-}
-
 function getAppCacheKeys() {
   return [
     LOCAL_KEYS.APP_PREFERENCES,
     LOCAL_KEYS.CONTENT_FAVORITES,
     LOCAL_KEYS.CHECKIN_GOALS,
     LOCAL_KEYS.CHECKIN_HISTORY,
-    LOCAL_KEYS.EXIT_REMIND_DISABLED,
     LOCAL_KEYS.LOGS
   ];
 }
@@ -593,7 +503,6 @@ module.exports = {
   LOCAL_KEYS,
   DEFAULT_APP_PREFERENCES,
   buildFavoriteKey,
-  buildAiFavoriteKey,
   getCurrentOpenId,
   getAppPreferencesCache,
   setAppPreferencesCache,
@@ -610,9 +519,6 @@ module.exports = {
   saveCheckinGoalsToCloud,
   loadCheckinRecordsFromCloud,
   saveCheckinRecordToCloud,
-  loadAiFavoritesFromCloud,
-  saveAiFavoritesToCloud,
-  removeAiFavoritesByIds,
   getAppCacheKeys,
   clearAppCache,
   clearUserSessionCache,

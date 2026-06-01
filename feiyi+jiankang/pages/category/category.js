@@ -1,7 +1,3 @@
-const {
-  ensurePrivacyHomeLock
-} = require('../../utils/access');
-
 function normalizeMediaValue(value) {
   if (!value) return '';
   if (typeof value === 'string') return value;
@@ -55,15 +51,8 @@ Page({
   },
 
   onLoad(options) {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
     const typeId = options.id || 'sports';
     this.loadCategoryData(typeId);
-  },
-
-  onShow() {
-    ensurePrivacyHomeLock(this, { allowAgreement: true });
   },
 
   getCategoryMeta(typeId) {

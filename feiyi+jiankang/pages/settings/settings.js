@@ -11,10 +11,6 @@ const {
   formatBytes
 } = require('../../utils/dataSync');
 
-const {
-  ensurePrivacyHomeLock
-} = require('../../utils/access');
-
 Page({
   data: {
     notify: DEFAULT_APP_PREFERENCES.notify,
@@ -23,9 +19,6 @@ Page({
   },
 
   async onShow() {
-    if (ensurePrivacyHomeLock(this, { allowAgreement: true })) {
-      return;
-    }
     await this.loadPreferences();
     this.updateCacheSize();
   },
@@ -125,13 +118,6 @@ Page({
       title: '关于遗韵养生',
       content: '一款致力于传承非物质文化遗产与倡导健康生活方式的小程序。\n\n版本：v1.0.0',
       showCancel: false
-    });
-  },
-
-  openAgreement(e) {
-    const type = e.currentTarget.dataset.type || 'privacy';
-    wx.navigateTo({
-      url: `/pages/agreement/agreement?type=${type}`
     });
   },
 

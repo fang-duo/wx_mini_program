@@ -16,7 +16,7 @@ App({
     wx.setStorageSync('logs', logs)
     
     const localUserInfo = wx.getStorageSync('local_user_info')
-    if (localUserInfo && localUserInfo.nickname) {
+    if (localUserInfo && typeof localUserInfo === 'object') {
       this.globalData.userInfo = { ...localUserInfo }
     }
 
@@ -38,8 +38,6 @@ App({
       avatarUrl: ''
     },
     isLoggedIn: false,
-    privacyAccepted: false,
-    isBrowseOnly: false,
     appPreferences: {
       notify: true
     }

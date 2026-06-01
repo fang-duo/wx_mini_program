@@ -20,5 +20,7 @@
       <input class="input" type="text" value="{{userInfo.nickname}}" bindinput="inputNickname" placeholder="请输入昵称" />
     </view>
   </view>
+  <view class="tips-text">修改头像或昵称后，点击下方按钮同步到当前账号。</view>
+  <button class="save-btn" bindtap="saveUserInfo" loading="{{saving}}" disabled="{{saving}}">保存资料</button>
   </block>
 </view>

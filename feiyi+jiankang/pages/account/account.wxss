@@ -98,3 +98,23 @@
   margin-left: 20rpx;
   font-family: monospace;
 }
+
+.tips-text {
+  margin-top: 24rpx;
+  padding: 0 8rpx;
+  font-size: 26rpx;
+  line-height: 1.8;
+  color: #6c7f70;
+}
+
+.save-btn {
+  margin-top: 28rpx;
+  border-radius: 999rpx;
+  background: #2E5A42;
+  color: #fff;
+  font-size: 30rpx;
+}
+
+.save-btn::after {
+  border: none;
+}
