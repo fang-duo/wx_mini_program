@@ -74,7 +74,7 @@ Page({
     wx.setNavigationBarTitle({ title: contentType === 'campaign' ? '活动详情' : '非遗详情' });
 
     if (!wx.cloud) {
-      this.showLoadError('内容暂不可用', '当前环境暂不支持读取云端内容，请稍后再试。');
+      this.showLoadError('内容暂不可用', '当前内容暂时无法显示，请稍后再试。');
       return;
     }
 
@@ -98,7 +98,7 @@ Page({
 
       const cloudData = (detailRes.data && (Array.isArray(detailRes.data) ? detailRes.data[0] : detailRes.data)) || null;
       if (!cloudData) {
-        this.showLoadError('暂无正式内容', '当前内容尚未在云端发布，请稍后再来查看。');
+        this.showLoadError('暂无内容', '当前内容暂未发布，请稍后再来查看。');
         return;
       }
 
@@ -127,8 +127,8 @@ Page({
       });
       this.checkStarStatus();
     } catch (error) {
-      console.error('详情页云端内容加载失败：', error);
-      this.showLoadError('内容加载失败', '正式内容读取失败，请稍后重试。');
+      console.error('详情页内容加载失败：', error);
+      this.showLoadError('内容加载失败', '内容加载失败，请稍后重试。');
     }
   },
 
@@ -223,20 +223,10 @@ Page({
     }
   },
 
-  goToVideo() {
+  goToGuide() {
     if (!this.data.article) return;
-    const finalUrl = this.data.article.videoUrl;
-
-    if (!finalUrl) {
-      wx.showToast({
-        title: this.data.article.contentType === 'campaign' ? '该活动暂无视频内容' : '该项目暂无视频教程',
-        icon: 'none'
-      });
-      return;
-    }
-
     wx.navigateTo({
-      url: `/pages/video-play/video-play?url=${encodeURIComponent(finalUrl)}&title=${encodeURIComponent(this.data.article.title || '')}&cover=${encodeURIComponent(this.data.article.cover || '')}`
+      url: `/pages/guide/guide?itemId=${encodeURIComponent(this.data.article.id || '')}&contentType=${encodeURIComponent(this.data.article.contentType || 'heritage')}&title=${encodeURIComponent(this.data.article.title || '')}`
     });
   },
 

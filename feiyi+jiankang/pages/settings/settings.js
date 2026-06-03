@@ -91,7 +91,7 @@ Page({
   clearCache() {
     wx.showModal({
       title: '提示',
-      content: '确定要清除本地缓存吗？这不会删除云端收藏和云端打卡记录。',
+      content: '确定要清除本地缓存吗？这不会删除已同步的收藏和打卡记录。',
       success: (res) => {
         if (res.confirm) {
           wx.showLoading({ title: '清理中...' });

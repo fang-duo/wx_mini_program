@@ -1,7 +1,7 @@
 <view class="container">
   <view class="loading-state" wx:if="{{loading}}">
     <view class="loading-title">内容加载中</view>
-    <view class="loading-desc">正在读取云端正式内容，请稍候。</view>
+    <view class="loading-desc">内容加载中，请稍候。</view>
   </view>
 
   <view class="empty-state" wx:elif="{{loadErrorTitle}}">
@@ -36,7 +36,7 @@
         <view class="paragraph" wx:if="{{article.section2Content}}">{{article.section2Content}}</view>
 
         <view class="empty-inline" wx:if="{{!article.intro && !article.section1Content && !article.section2Content}}">
-          当前暂无更多图文介绍，请以后续云端发布内容为准。
+          当前暂无更多图文介绍，请稍后再来查看。
         </view>
       </view>
     </view>
@@ -46,7 +46,7 @@
         <text class="action-icon">{{isStarred ? '⭐' : '☆'}}</text>
         <text class="action-text">{{isStarred ? '已收藏' : '收藏'}}</text>
       </view>
-      <view class="footer-btn" bindtap="goToVideo">开始练习</view>
+      <view class="main-btn" bindtap="goToGuide">{{article.contentType === 'campaign' ? '查看活动指引' : '查看练习指引'}}</view>
     </view>
   </block>
 </view>

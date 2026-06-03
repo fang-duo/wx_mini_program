@@ -1,0 +1,41 @@
+<view class="container">
+  <view class="loading-state" wx:if="{{loading}}">
+    <view class="loading-title">指引加载中</view>
+    <view class="loading-desc">内容加载中，请稍候。</view>
+  </view>
+
+  <view class="empty-state" wx:elif="{{loadErrorTitle}}">
+    <view class="empty-title">{{loadErrorTitle}}</view>
+    <view class="empty-desc">{{loadErrorDesc}}</view>
+  </view>
+
+  <block wx:else>
+    <view class="hero-card" wx:if="{{guide.cover}}">
+      <image class="hero-image" src="{{guide.cover}}" mode="aspectFill"></image>
+      <view class="hero-mask"></view>
+      <view class="hero-title">{{guide.title}}</view>
+    </view>
+
+    <view class="page-title" wx:else>{{guide.title}}</view>
+
+    <view class="content-box">
+      <view class="intro-card" wx:if="{{guide.intro}}">
+        <view class="intro-title">指引简介</view>
+        <view class="intro-text">{{guide.intro}}</view>
+      </view>
+
+      <block wx:for="{{guide.sections}}" wx:key="sort">
+        <view class="section-card">
+          <view class="section-title" wx:if="{{item.title}}">{{item.title}}</view>
+          <image class="section-image" src="{{item.image}}" mode="widthFix" wx:if="{{item.image}}"></image>
+          <view class="section-text" wx:if="{{item.text}}">{{item.text}}</view>
+        </view>
+      </block>
+
+      <view class="tips-card" wx:if="{{guide.tips}}">
+        <view class="tips-title">温馨提示</view>
+        <view class="tips-text">{{guide.tips}}</view>
+      </view>
+    </view>
+  </block>
+</view>
