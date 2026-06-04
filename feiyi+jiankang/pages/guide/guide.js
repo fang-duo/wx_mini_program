@@ -20,15 +20,19 @@ function normalizeGuideSections(sections) {
     .map((item, index) => {
       if (!item || typeof item !== 'object') return null;
 
+      const badge = normalizeTextValue(item.badge);
+      const introLabel = normalizeTextValue(item.introLabel);
+      const detailLabel = normalizeTextValue(item.detailLabel);
       const title = normalizeTextValue(item.title);
+      const intro = normalizeTextValue(item.intro || item.summary || item.desc);
       const text = normalizeTextValue(item.text);
       const image = normalizeMediaValue(item.image);
       const parsedSort = Number(item.sort);
       const sort = Number.isFinite(parsedSort) ? parsedSort : index + 1;
 
-      if (!title && !text && !image) return null;
+      if (!badge && !introLabel && !detailLabel && !title && !intro && !text && !image) return null;
 
-      return { title, text, image, sort };
+      return { badge, introLabel, detailLabel, title, intro, text, image, sort };
     })
     .filter(Boolean)
     .sort((left, right) => left.sort - right.sort);

@@ -20,15 +20,25 @@
 
     <view class="content-box">
       <view class="intro-card" wx:if="{{guide.intro}}">
-        <view class="intro-title">指引简介</view>
+        <view class="intro-title">练习简介</view>
         <view class="intro-text">{{guide.intro}}</view>
       </view>
 
       <block wx:for="{{guide.sections}}" wx:key="sort">
         <view class="section-card">
-          <view class="section-title" wx:if="{{item.title}}">{{item.title}}</view>
+          <view class="section-header">
+            <view class="section-badge">{{item.badge || ('模块' + (index + 1))}}</view>
+            <view class="section-title" wx:if="{{item.title}}">{{item.title}}</view>
+          </view>
+          <view class="section-intro-block" wx:if="{{item.intro}}">
+            <view class="section-label">{{item.introLabel || '简介'}}</view>
+            <view class="section-intro">{{item.intro}}</view>
+          </view>
           <image class="section-image" src="{{item.image}}" mode="widthFix" wx:if="{{item.image}}"></image>
-          <view class="section-text" wx:if="{{item.text}}">{{item.text}}</view>
+          <view class="section-detail-block" wx:if="{{item.text}}">
+            <view class="section-label">{{item.detailLabel || '指引介绍'}}</view>
+            <view class="section-text">{{item.text}}</view>
+          </view>
         </view>
       </block>
 
