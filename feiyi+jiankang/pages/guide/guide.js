@@ -8,6 +8,19 @@ function normalizeMediaValue(value) {
   return '';
 }
 
+function normalizeMediaList(value) {
+  if (!value) return [];
+
+  if (Array.isArray(value)) {
+    return value
+      .map(item => normalizeMediaValue(item))
+      .filter(Boolean);
+  }
+
+  const singleValue = normalizeMediaValue(value);
+  return singleValue ? [singleValue] : [];
+}
+
 function normalizeTextValue(value) {
   if (!value) return '';
   return typeof value === 'string' ? value.trim() : String(value).trim();
@@ -26,13 +39,14 @@ function normalizeGuideSections(sections) {
       const title = normalizeTextValue(item.title);
       const intro = normalizeTextValue(item.intro || item.summary || item.desc);
       const text = normalizeTextValue(item.text);
-      const image = normalizeMediaValue(item.image);
+      const images = normalizeMediaList(item.images && item.images.length ? item.images : item.image);
+      const image = images[0] || '';
       const parsedSort = Number(item.sort);
       const sort = Number.isFinite(parsedSort) ? parsedSort : index + 1;
 
       if (!badge && !introLabel && !detailLabel && !title && !intro && !text && !image) return null;
 
-      return { badge, introLabel, detailLabel, title, intro, text, image, sort };
+      return { badge, introLabel, detailLabel, title, intro, text, image, images, sort };
     })
     .filter(Boolean)
     .sort((left, right) => left.sort - right.sort);

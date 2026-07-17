@@ -155,9 +155,17 @@
   background: #f6f8f5;
 }
 
+.section-images {
+  margin-top: 20rpx;
+}
+
 .section-image {
   width: 100%;
-  margin-top: 20rpx;
+  margin-top: 16rpx;
   border-radius: 16rpx;
   background: #eef3ee;
+}
+
+.section-image:first-child {
+  margin-top: 0;
 }

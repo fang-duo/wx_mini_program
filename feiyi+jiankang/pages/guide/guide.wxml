@@ -34,7 +34,11 @@
             <view class="section-label">{{item.introLabel || '简介'}}</view>
             <view class="section-intro">{{item.intro}}</view>
           </view>
-          <image class="section-image" src="{{item.image}}" mode="widthFix" wx:if="{{item.image}}"></image>
+          <view class="section-images" wx:if="{{item.images && item.images.length}}">
+            <block wx:for="{{item.images}}" wx:key="*this">
+              <image class="section-image" src="{{item}}" mode="widthFix"></image>
+            </block>
+          </view>
           <view class="section-detail-block" wx:if="{{item.text}}">
             <view class="section-label">{{item.detailLabel || '指引介绍'}}</view>
             <view class="section-text">{{item.text}}</view>
